@@ -369,7 +369,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       $s .= html_div( $tr . ( ( $n_aff >= 1 ) ? ' solidtop' : '' ), html_div( $th, we('external affiliation:', "externe Zugeh{$oUML}rigkeit:") ) . html_div( $td, $t ) );
     }
 
-  $s .= html_div('table', false );
+  $s .= html_div( false );
   return $s;
 }
   

@@ -16,6 +16,9 @@ if( ! $person = sql_person( "people_id=$people_id,flag_publish,flag_deleted=0,fl
   return;
 }
 
-echo person_visitenkarte_view( $person );
+open_ccbox( '', we('contact information', 'Visitenkarte' ) );
+  echo person_visitenkarte_view( $person );
+close_ccbox();
+
 
 ?>
