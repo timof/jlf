@@ -48,8 +48,14 @@ function image( $tag, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $credits = adefault( $opts, 'credits', true );
   switch( $tag ) {
+    case 'black':
+      return html_img( '/pp/fotos/teaserbck.gif'
+      , ''
+      , ''
+      , array( 'format' => 'gif' )
+      );
     case 'h28':
-      return html_img( '/pp/fotos/haus28s.jpg'
+      return html_img( '/pp/fotos/haus28b.jpg'
       , we('Physics Institute - building 28 on university campus Golm', 'Institutsgebäude - Haus 28 am Campus Golm')
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
@@ -61,13 +67,13 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'forschung':
-      return html_img( '/pp/fotos/forschung3.jpg'
+      return html_img( '/pp/fotos/forschung3a.jpg'
       , we('Working in lab on optical table','Arbeit im Labor am optischen Tisch' )
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
       );
     case 'lehre':
-      return html_img( '/pp/fotos/lehre.jpg'
+      return html_img( '/pp/fotos/lehreh27a.jpg'
       , we('Physics lecture in large lecture hall', 'Physikvorlesung im großsen Hörsaal')
       , ( $credits === true ? credits('Carsten Beta') : $credits )
       , $opts
@@ -85,7 +91,7 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'h28innenhof':
-      return html_img( '/pp/fotos/innenhof.jpg'
+      return html_img( '/pp/fotos/innenhof2.jpg'
       ,  we( 'Inner courtyard of the physics building at night','Innenhof des Physikgebäudes bei Nacht' )
       , ( $credits === true ? credits('David Gruner') : $credits )
       , $opts
@@ -109,13 +115,13 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'rara':
-      return html_img( '/pp/fotos/rara.jpg'
+      return html_img( '/pp/fotos/rara3.jpg'
       , '' // 'Rara der Uni-Bibliothek'
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
       );
     case 'labor':
-      return html_img( '/pp/fotos/labor3.jpg'
+      return html_img( '/pp/fotos/labor4.jpg'
       , we('Handling hazardous material in glovebox','Umgang mit gefährlichem Material im Handschuhkasten')
       , ( $credits === true ? credits('Dieter Neher') : $credits )
       , $opts
