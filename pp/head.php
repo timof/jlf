@@ -6,7 +6,7 @@ $font_size = $css_font_size['value'];
 
 html_head_view();
 
-open_tag( 'body', 'theBody,class='.( $debug & DEBUG_FLAG_LAYOUT ? 'debug' : '' ) );
+open_tag( 'body', 'id=theBody,class='.( $debug & DEBUG_FLAG_LAYOUT ? 'debug' : '' ) );
 
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
@@ -30,15 +30,15 @@ open_div( 'hfill,id=theHeader' );
   // $l = html_tag( 'img', 'src=/pp/img/h28i7.jpg,alt='.we('physics institute - inside view','Physikinstitut - Innenansicht'), NULL );
   $l = inlink( 'menu', array( 'class' => 'image', 'text' => image( 'h28i', 'credits=' ) ) );
   open_div( 'id=theLeftLogo', $l );
-  open_div( 'id=theFaknav' );
-    require_once( 'pp/faknav.php' );
-  close_div();
   open_div( 'id=theUninav' );
     require_once( 'pp/uninav.php' );
   close_div();
+  open_div( 'id=theFaknav' );
+    require_once( 'pp/faknav.php' );
+  close_div();
 close_div();
 
-open_div( 'id=theOutback' );
+open_div( 'id=theOutback,clear' );
 
   open_div( 'id=theSidenav' );
     require_once( 'pp/sidenav.php' );

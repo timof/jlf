@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20140106.072739utc  by: root@uranos
+<?php // sidenav.php - last modified:  20170926.124335utc  by: root@uranos
 
 
 function build_menu_tree( $map, $parents = array() ) {
@@ -61,48 +61,54 @@ function build_menu_tree( $map, $parents = array() ) {
 
 list( $menu, $devnull, $sidenav_flatmap ) = build_menu_tree( $sidenav_map );
 
-echo $menu;
+open_div( 'id=theSideMenu' );
+  echo $menu;
 
-open_div( 'links oneline,id=languageLinks' );
-  if( $language == 'D' ) {
-    // open_span( 'quads inactive', 'deutsch' );
-    echo inlink( '!', array(
-      'class' => 'icon inlink tinypads', 'text' => 'language: switch to English', 'language' => 'E'
-    , 'title' => 'switch to English language / Sprache: auf Englisch umschalten'
-    ) );
-  } else {
-    echo inlink( '!', array(
-      'class' => 'icon inlink tinypads', 'text' => 'Sprache: auf Deutsch umschalten', 'language' => 'D'
-    , 'title' => 'Sprache: auf Deutsch umschalten / switch to German language'
-    ) );
-    // open_span( 'quads inactive', 'english' );
+  open_div( 'links oneline,id=languageLinks' );
+    echo we('Sprache: ','language:');
+    if( $language == 'D' ) {
+      // open_span( 'quads inactive', 'deutsch' );
+      echo inlink( '!', array(
+        'class' => 'icon inlink', 'text' => 'switch to English', 'language' => 'E'
+      , 'title' => 'switch to English language / Sprache: auf Englisch umschalten'
+      ) );
+    } else {
+      echo inlink( '!', array(
+        'class' => 'icon inlink tinypads', 'text' => 'auf Deutsch umschalten', 'language' => 'D'
+      , 'title' => 'Sprache: auf Deutsch umschalten / switch to German language'
+      ) );
+      // open_span( 'quads inactive', 'english' );
+    }
+  close_div();
+
+  open_div( 'links oneline,id=selectFontSize' );
+    echo we('font size: ','Schriftgröße:');
+    if( $font_size > 8 ) {
+      $f = $font_size - 1;
+      open_span( 'qquadl', inlink( '!', array(
+        'class' => 'icon inlink', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
+      , 'title' => we('decrease font size to ','Schriftgröße herabsetzen auf ')."{$f}pt"
+      ) ) );
+      unset( $f );
+    }
+    if( $font_size < 16 ) {
+      $f = $font_size + 1;
+      open_span( 'qquadl', inlink( '!', array(
+        'class' => 'icon inlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+      , 'title' => we('increase font size to ','Schriftgröße erhöhen auf ')."{$f}pt"
+      ) ) );
+      unset( $f );
+    }
+  close_div();
+  if( $debug || $show_debug_button ) {
+    open_div( 'links,id=debugButton', debug_button_view() );
   }
 close_div();
 
-open_div( 'links oneline,id=selectFontSize' );
-  echo we('font size: ','Schriftgröße:');
-  if( $font_size > 8 ) {
-    $f = $font_size - 1;
-    open_span( 'qquadl', inlink( '!', array(
-      'class' => 'icon inlink', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
-    , 'title' => we('decrease font size to ','Schriftgröße herabsetzen auf ')."{$f}pt"
-    ) ) );
-    unset( $f );
-  }
-  if( $font_size < 16 ) {
-    $f = $font_size + 1;
-    open_span( 'qquadl', inlink( '!', array(
-      'class' => 'icon inlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
-    , 'title' => we('increase font size to ','Schriftgröße erhöhen auf ')."{$f}pt"
-    ) ) );
-    unset( $f );
-  }
+open_div( 'id=theAddressBox' );
+  address_view();
 close_div();
 
-address_view();
 
-if( $debug || $show_debug_button ) {
-  open_div( 'links,id=debugButton', debug_button_view() );
-}
 
 ?>
