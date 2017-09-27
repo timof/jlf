@@ -12,26 +12,6 @@
   max-width:240px;
   max-height:240px;
 }
-.large > span.photo > img, .large > span.photo > a > img {
-  display:block;
-  max-width:360px;
-  max-height:320px;
-  min-width:360px;
-}
-.huge > span.photo > img, .large > span.photo > a > img {
-  display:block;
-  max-width:480px;
-  max-height:320px;
-  min-width:480px;
-}
-.teaser img {
-  max-width:320px;
-  max-height:240px;
-}
-.banner > span.photo > img {
-  max-width:800px;
-  max-height:400px;
-}
 
 .illu {
   display:inline-block;
@@ -51,6 +31,7 @@
   font-size:smaller;
   white-space:nowrap;
 }
+
 .keyarea .textaroundphoto, .group .textaroundphoto {
   display:inline-block;
   max-width:700px;
@@ -65,32 +46,7 @@
   max-width:400px;
   padding:1em;
 }
-  
 
-
-
-.level1photo .photo > img {
-  min-width:320px;
-  max-width:320px;
-  min-height:175px;
-  max-height:175px;
-}
-
-.keyareas .photo > img {
-  display:block;
-  max-width:240px;
-  min-width:240px;
-  max-height:160px;
-  min-height:160px;
-}
-
-.keyareathumbnails .photo > img {
-  display:block;
-  max-width:120px;
-  min-width:120px;
-  max-height:80px;
-  min-height:80px;
-}
 
 .highlight {
   padding-top:2em;
@@ -130,7 +86,7 @@
   padding:0ex 1ex 2ex 1ex;
   margin:0px;
 }
-  
+
 .highlight > ul > li > span {
   display:block;
   padding:0ex 0ex 0ex 2ex;
@@ -172,31 +128,11 @@ table.events > tbody > tr > td {
   padding:1ex 3ex 1ex 0ex;
 }
 
-/* model for ticker: div.tickerbox > div.tickeritem > span.tickerline */
-
-/* this doesnt work well - can't seem to avoid line break after :before :-(
- *
- * span.tickerline:before {
- *   content:"+++";
- *   white-space:nowrap;
- *   padding-right:8em;
- * }
- * span.tickerline:after {
- *   content:"+++";
- *   white-space:nowrap;
- *   padding-left:8em;
- * }
-*/
 div.tickeritem {
   text-align:center;
   padding:4px 36px 4px 36px;
 }
 
-div.column {
-  display:inline-block;
-  margin-right:3em;
-  vertical-align:top;
-}
 
 ul.linklist > li {
   margin-top:4px;
