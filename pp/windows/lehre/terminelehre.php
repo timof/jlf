@@ -178,8 +178,6 @@ open_ccbox( '', we('Dates in Summer term 2017',"Termine im Sommersemester 2017")
       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
   
     open_tr();
-  
-    open_tr();
       open_td();
         open_span( 'block', 'F. Feudel' );
         open_span( 'block', 'Mathematische Grundlagen' );
