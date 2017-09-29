@@ -69,8 +69,7 @@ $f['groups_id']['choices'] = sql_query( 'groups', array(
 ) );
 
 open_div('menubox');
-  open_table('css filters');
-    open_caption( '', filter_reset_button( $f ) . 'Filter' );
+  open_table( array( 'class' => 'css filters', 'caption' => filter_reset_button( $f ) . 'Filter' ) );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
