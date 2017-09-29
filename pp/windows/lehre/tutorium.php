@@ -22,8 +22,12 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
     dieses Angebot wahrzunehmen!
   ";
 
-  open_table( 'bigskips th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
-    open_caption( 'Large', we('Tutorials in Summer term 2017','Termine im Sommersemester 2017') );
+  open_table( array(
+    'class' => 'bigskips th;td:smallskipb;qquads;oneline th:black;bold;solidtop'
+  , 'id' => 'tutorium'
+  , 'caption' => we('Tutorials in Summer term 2017','Termine im Sommersemester 2017') 
+  , 'colgroup' => '40% 30% 30%'
+  );
     open_tr();
       open_th('', we('times','Termine') );
       open_th('', we('rooms',"R{$aUML}ume") );

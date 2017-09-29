@@ -196,7 +196,7 @@ function nobubble( e ) {
   if( e.stopPropagation ) {
     e.stopPropagation();
   } else if( e.cancelBubble ) {
-    e.cancelBubble();
+    e.cancelBubble = true;
   }
 }
 

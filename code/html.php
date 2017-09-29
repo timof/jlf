@@ -499,8 +499,12 @@ function open_table( $options = array() ) {
   $sort_prefix = '';
   $cols = array();
   $classes = array();
+  $caption = '';
   foreach( $options as $key => $val ) {
     switch( $key ) {
+      case 'caption':
+        $caption = $val;
+        break;
       case 'colgroup':
         $colgroup = $val;
         break;
@@ -542,6 +546,9 @@ function open_table( $options = array() ) {
   $attr['class'] = $classes;
   $current_table =& open_tag( 'table', $attr );
 
+  if( $caption ) {
+    open_caption( '', $caption );
+  }
   if( $colgroup ) {
     echo html_tag( 'colgroup' );
     foreach( explode( ' ', $colgroup ) as $w ) {
