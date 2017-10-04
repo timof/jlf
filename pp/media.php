@@ -40,7 +40,7 @@ $media = array(
 open_div('nodisplay');
   foreach( $media as $tag => $src ) {
     $id = 'i'.new_html_id();
-    echo html_tag( 'img', "id=$tag,src=$src,alt=$tag" );
+    echo html_tag( 'img', "id=$tag,src=$src,alt=" );
   }
 close_div();
 
