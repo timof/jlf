@@ -524,6 +524,7 @@ function sanitize_http_input() {
     }
   }
   if( ( $request_method == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
+    unset( $_POST['devnull'] );
     if( $insert_itan_in_forms ) {
       // all forms must post a valid and unused iTAN:
       need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );

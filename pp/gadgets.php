@@ -76,7 +76,7 @@ function select_element( $field, $more_opts = array() ) {
 
   $id = 'select'.new_html_id();
   $attr = array(
-    'name' => '' // don't submit unless changed
+    'name' => 'devnull' // submit only onchange() - regular submits are discarded
   , 'id' => $id
   , 'class' => $fieldclass
   );
