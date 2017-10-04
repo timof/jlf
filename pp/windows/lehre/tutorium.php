@@ -27,7 +27,7 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
   , 'id' => 'tutorium'
   , 'caption' => we('Tutorials in Summer term 2017','Termine im Sommersemester 2017') 
   , 'colgroup' => '40% 30% 30%'
-  );
+  ) );
     open_tr();
       open_th('', we('times','Termine') );
       open_th('', we('rooms',"R{$aUML}ume") );
