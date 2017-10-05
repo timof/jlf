@@ -29,7 +29,8 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 
       open_tag('h4', '', we('groups and professors:','Arbeitsgruppen und Professuren:') );
       $profs = array_merge(
-        sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ), array( 'orderby' => 'head_sn, head_gn' ) )
+        sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR, 'head_people_id!=0' ), array( 'orderby' => 'head_sn, head_gn' ) )
+      , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR, 'head_people_id=0' ), array( 'orderby' => 'head_sn, head_gn' ) )
       , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ), array( 'orderby' => 'head_sn, head_gn' ) )
       , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_OTHER ), array( 'orderby' => 'head_sn, head_gn' ) )
       );
