@@ -1,9 +1,9 @@
-<?php // uninav.php - last modified:  20131201.132513utc  by: root@uranos
+<?php // uninav.php - last modified:  20171004.081518utc  by: root@uranos
 
 echo html_map( array(
   'id' => 'unimap'
 , array( 'shape' => 'circle', 'coords' => '5,30,14'
-  , 'title' => we('Law School','Juristische Fakult&auml;t')
+  , 'title' => we('Law School','Juristische Fakultät')
   , 'href' => we( URL_FAKJURA_E, URL_FAKJURA_D )
   , 'onmouseover' => 'moverjura();'
   , 'onmouseout' => 'mooseout();'
@@ -40,6 +40,6 @@ echo html_map( array(
   )
 ) );
 
-echo html_tag( 'img', 'src=/pp/img/fakmatnat.gif,id=unilogo,usemap=#unimap,alt=Uni Potsdam Logo' );
+echo html_tag( 'img', 'src=/pp/img/fakmatnat.gif,id=unilogo,usemap=#unimap,alt=Logo der Universität Potsdam' );
 
 ?>

@@ -3,9 +3,9 @@
 sql_transaction_boundary('*');
 
 open_div('id=teaser');
-  open_div( 'class=overlay init,id=i0', image('h28') );
-  open_div( 'class=overlay,id=i1', image('lehre') );
-  open_div( 'class=overlay,id=i2', image('forschung') );
+  open_div( 'class=overlay,id=i1', image( 'lehre', 'alt=' ) );
+  open_div( 'class=overlay,id=i2', image( 'forschung', 'alt=' ) );
+  open_div( 'class=overlay init,id=i0', image( 'h28' ) );
 
   open_div('linkbox');
     echo inlink( 'lehre', array(

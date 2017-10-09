@@ -40,7 +40,7 @@ $media = array(
 open_div('nodisplay');
   foreach( $media as $tag => $src ) {
     $id = 'i'.new_html_id();
-    echo html_tag( 'img', "id=$tag,src=$src,alt=$tag" );
+    echo html_tag( 'img', "id=$tag,src=$src,alt=" );
   }
 close_div();
 
@@ -68,13 +68,13 @@ function image( $tag, $opts = array() ) {
       );
     case 'forschung':
       return html_img( '/pp/fotos/forschung3a.jpg'
-      , we('Working in lab on optical table','Arbeit im Labor am optischen Tisch' )
+      , adefault( $opts, 'alt', we('Working in lab on optical table','Arbeit im Labor am optischen Tisch' ) )
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
       );
     case 'lehre':
       return html_img( '/pp/fotos/lehreh27a.jpg'
-      , we('Physics lecture in large lecture hall', 'Physikvorlesung im großsen Hörsaal')
+      , adefault( $opts, 'alt', we('Physics lecture in large lecture hall', 'Physikvorlesung im großsen Hörsaal'))
       , ( $credits === true ? credits('Carsten Beta') : $credits )
       , $opts
       );
