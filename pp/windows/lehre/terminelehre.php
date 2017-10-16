@@ -163,15 +163,93 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2017/18',"Pr{$uUML}fungstermine im Wintersemester 2017/18") );
   // 
   
+   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+   
+     open_tr();
+       open_th( '', we( 'course', 'Veranstaltung' ) );
+       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'F. Feudel' );
+//         open_span( 'block', 'Mathematische Grundlagen' );
+//         open_span( 'block', 'BEd A111, PHY-111LAS' );
+//       open_td();
+//         open_span( 'block', '20.07.' );
+//         open_span( 'block', '14-16 Uhr' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '27.09.' );
+//         open_span( 'block', '9.15-13 Uhr' );
+//         open_span( 'block', '2.28.2.123' );
+//   
+     open_tr();
+       open_td();
+         open_span( 'block', 'R. Gerhard' );
+         open_span( 'block', 'Experimentalphysik I' );
+         open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
+       open_td();
+         open_span( 'block', '19.02.' );
+         open_span( 'block', '10.15-11.45 Uhr' );
+         open_span( 'block', '2.27.0.01' );
+       open_td();
+         open_span( 'block', '27.03.' );
+         open_span( 'block', '10.15-11.45 Uhr' );
+         open_span( 'block', '2.27.0.01' );
+
+     open_tr();
+       open_td();
+         open_span( 'block', 'A. Feldmeier' );
+         open_span( 'block', 'Theoretische Physik II - Elektrodynami und Relativität' );
+         open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
+       open_td();
+         open_span( 'block', '15.02.' );
+         open_span( 'block', '10-12 Uhr' );
+         open_span( 'block', '2.28.0.108' );
+       open_td();
+         open_span( 'block', '05.04.' );
+         open_span( 'block', '10-12 Uhr' );
+         open_span( 'block', 'tba' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+//         open_span( 'block', 'BSc 411' );
+//       open_td();
+//         open_span( 'block', '03.08.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//       open_td();
+//         open_span( 'block', '28.09.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.2.080' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III Lehramt' );
+//         open_span( 'block', 'MEd Physik, Modul A711' );
+//       open_td();
+//         open_span( 'block', '03.08.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//       open_td();
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//   
+   close_table();
   
-  // open_div( 'smallskips'
-  // , we(   'More dates will be published here as soon as they are available.'
-  //       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
-  // );
   open_div( 'smallskips'
-  , we(   '(exam dates will be published here as soon as they are available.)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  , we(   'More dates will be published here as soon as they are available.'
+        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
   );
+//   open_div( 'smallskips'
+//   , we(   '(exam dates will be published here as soon as they are available.)'
+//         , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+//   );
 
 close_ccbox();
 
