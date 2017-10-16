@@ -201,7 +201,7 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
      open_tr();
        open_td();
          open_span( 'block', 'A. Feldmeier' );
-         open_span( 'block', 'Theoretische Physik II - Elektrodynami und Relativität' );
+         open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
        open_td();
          open_span( 'block', '15.02.' );
@@ -211,20 +211,20 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
          open_span( 'block', '05.04.' );
          open_span( 'block', '10-12 Uhr' );
          open_span( 'block', 'tba' );
-//   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
-//         open_span( 'block', 'BSc 411' );
-//       open_td();
-//         open_span( 'block', '03.08.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//       open_td();
-//         open_span( 'block', '28.09.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.2.080' );
+  
+    open_tr();
+      open_td();
+        open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
+        open_span( 'block', 'MSc 711' );
+        open_td();
+          open_span( 'block', '15.02.' );
+          open_span( 'block', '10.00 Uhr' );
+          open_span( 'block', '2.28.0.108' );
+        open_td();
+          open_span( 'block', '' );
+          open_span( 'block', '' );
+          open_span( 'block', '' );
 //   
 //     open_tr();
 //       open_td();
