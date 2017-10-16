@@ -688,6 +688,7 @@ chmod 644 ./pp/windows/lehre/bed.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 644 ./pp/windows/lehre/diplom.php
 chmod 644 ./pp/windows/lehre/einschreibung.php
+chmod 600 ./pp/windows/lehre/exam.template.summer
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.php
 chmod 644 ./pp/windows/lehre/mastro.php

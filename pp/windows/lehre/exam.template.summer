@@ -1,0 +1,78 @@
+//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+//   
+//     open_tr();
+//       open_th( '', we( 'course', 'Veranstaltung' ) );
+//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'F. Feudel' );
+//         open_span( 'block', 'Mathematische Grundlagen' );
+//         open_span( 'block', 'BEd A111, PHY-111LAS' );
+//       open_td();
+//         open_span( 'block', '20.07.' );
+//         open_span( 'block', '14-16 Uhr' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '27.09.' );
+//         open_span( 'block', '9.15-13 Uhr' );
+//         open_span( 'block', '2.28.2.123' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Bargheer' );
+//         open_span( 'block', 'Experimentalphysik II' );
+//         open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
+//       open_td();
+//         open_span( 'block', '31.07.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '18.09.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'R. Metzler' );
+//         open_span( 'block', 'Theoretische Physik I - Mechanik' );
+//         open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
+//       open_td();
+//         open_span( 'block', '28.07.' );
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '28.09.' );
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+//         open_span( 'block', 'BSc 411' );
+//       open_td();
+//         open_span( 'block', '03.08.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//       open_td();
+//         open_span( 'block', '28.09.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.2.080' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III Lehramt' );
+//         open_span( 'block', 'MEd Physik, Modul A711' );
+//       open_td();
+//         open_span( 'block', '03.08.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//       open_td();
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//   
+//   close_table();
