@@ -14,30 +14,6 @@ close_div();
 
 open_ccbox('', we('Bachelor of Science (BSc) in physics','Bachelorstudiengang (BSc) Physik' ) );
 
-// open_tag( 'p', 'smallskips', we("
-//   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
-//   die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
-//   Wintersemesters m{$oUML}glich.
-//   Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
-//   Arbeitsatmosph{$aUML}re aus.
-// ","
-//   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
-//   die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
-//   Wintersemesters m{$oUML}glich.
-//   Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
-//   Arbeitsatmosph{$aUML}re aus.
-// " ) );
-// 
-// open_tag( 'p', 'smallskips', we("
-//   Admission to the Bachelor of Science (BSc, not teaching-oriented) program in physics is not restricted (no Numerus Clausus); no application is required before enrollment.
-// ", "
-//   Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht-lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
-// ") );
-
-$s = alink_document_view( array( 'tag' => 'flyer_bsc', 'flag_current', 'programme_flags &=' => PROGRAMME_BSC ), array( 'format' => 'list', 'default' => NULL ) );
-if( $s ) {
-  echo tb( $s );
-}
 
 echo tb( inlink( 'studiengaenge', 'anchor=bscmsc,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
