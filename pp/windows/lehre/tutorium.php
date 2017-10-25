@@ -35,16 +35,16 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
 
      open_tr();
        open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1. Semester' );
-//
-//     open_tr();
-//       open_td( '', 'Mittwoch, 14-16 Uhr' );
-//       open_td( '', '2.28.2.080' );
-//       open_td( '', 'Timon' );
-//
-//     open_tr();
-//       open_td( '', 'Donnerstag 08-10 Uhr' );
-//       open_td( '', '2.28.2.080' );
-//       open_td( '', 'Florian' );
+
+     open_tr();
+      open_td( '', 'Freitag, 12-14 Uhr' );
+      open_td( '', '2.09.013' );
+      open_td( '', 'Markus' );
+
+     open_tr();
+      open_td( '', 'Freitag, 12-14 Uhr' );
+      open_td( '', '2.28.0.102' );
+      open_td( '', 'Markus' );
 
     open_tr();
       open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
