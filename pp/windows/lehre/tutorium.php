@@ -44,7 +44,7 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
      open_tr();
       open_td( '', 'Freitag, 12-14 Uhr' );
       open_td( '', '2.28.0.102' );
-      open_td( '', 'Markus' );
+      open_td( '', 'Timon' );
 
     open_tr();
       open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
