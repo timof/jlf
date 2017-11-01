@@ -34,7 +34,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
       , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_OTHER ), array( 'orderby' => 'head_sn, head_gn' ) )
       );
       if( $topic == 'astro' ) {
-        $g = sql_one_group( 'acronym=astro I', 'default=0' );
+        $g = sql_one_group( 'acronym=astroms', 0 );
         $p_id = sql_people( 'cn=achim feldmeier', 'single_field=people_id,default=0' );
         if( $g && $p_id ) {
           $g['head_people_id'] = $p_id;
@@ -45,7 +45,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         }
       }
       if( $topic == 'photonik' ) {
-        $g = sql_one_group( 'acronym=quanten', 'default=0' );
+        $g = sql_one_group( 'acronym=quanten', 0 );
         $p_id = sql_people( 'cn=carsten henkel', 'single_field=people_id,default=0' );
         if( $g && $p_id ) {
           $g['head_people_id'] = $p_id;
