@@ -228,6 +228,20 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
 
     open_tr();
       open_td();
+      open_span( 'block', 'R. Metzler' );
+        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
+        open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
+      open_td();
+        open_span( 'block', '23.02.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+      open_td();
+        open_span( 'block', '20.03.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+
+    open_tr();
+      open_td();
         open_span( 'block', 'M. Wilkens' );
         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
         open_span( 'block', 'MSc 711' );
@@ -240,19 +254,6 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
           open_span( 'block', '' );
           open_span( 'block', '' );
 //   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Theoretische Physik III Lehramt' );
-//         open_span( 'block', 'MEd Physik, Modul A711' );
-//       open_td();
-//         open_span( 'block', '03.08.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//       open_td();
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
 //   
    close_table();
   
