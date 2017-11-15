@@ -211,20 +211,6 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
          open_span( 'block', '05.04.' );
          open_span( 'block', '10-12 Uhr' );
          open_span( 'block', 'tba' );
-  
-    open_tr();
-      open_td();
-        open_span( 'block', 'O. Rader' );
-        open_span( 'block', 'Höhere Festkörperphysik' );
-        open_span( 'block', 'MSc 701, Nebenfach ICSPHYS741LASe' );
-        open_td();
-          open_span( 'block', '22.02.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '2.28.0.108' );
-        open_td();
-          open_span( 'block', '' );
-          open_span( 'block', '' );
-          open_span( 'block', '' );
 
     open_tr();
       open_td();
@@ -239,6 +225,20 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
         open_span( 'block', '20.03.' );
         open_span( 'block', '' );
         open_span( 'block', '' );
+
+    open_tr();
+      open_td();
+        open_span( 'block', 'O. Rader' );
+        open_span( 'block', 'Höhere Festkörperphysik' );
+        open_span( 'block', 'MSc 701, Nebenfach ICSPHYS741LASe' );
+        open_td();
+          open_span( 'block', '22.02.' );
+          open_span( 'block', '10.00 Uhr' );
+          open_span( 'block', '2.28.0.108' );
+        open_td();
+          open_span( 'block', '' );
+          open_span( 'block', '' );
+          open_span( 'block', '' );
 
     open_tr();
       open_td();
