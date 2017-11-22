@@ -46,8 +46,8 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
       open_td( '', '2.28.0.102' );
       open_td( '', 'Timon' );
 
-    open_tr();
-      open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
+//    open_tr();
+//      open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
 
   // 
     open_tr();
