@@ -18,14 +18,15 @@ if( $s ) {
   echo tb( $s );
 }
 
+
+
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
 , 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang")
 ) );
 
-// echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
-echo tb( we('Course guidance',"Studienfachberatung")
+echo tb( we('Contact and course guidance',"Kontakt und Studienfachberatung")
        , alink_person_view( 'people_id!=0,board=guidance,function=mastro', 'office=1,format=list' )
 );
 
