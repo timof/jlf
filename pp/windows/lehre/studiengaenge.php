@@ -275,6 +275,8 @@ close_ccbox();
 open_ccbox( 'id=mastro', 'Astrophysics | Master (MSc)' );
   open_div( 'illu', image('astrophysics') );
 
+  echo tb( we('The language of instruction is English. No knowledge of German is required.','Unterrichtssprache ist englisch; Deutschkenntnisse sind nicht erforderlich.' ) );
+
   echo tb( 'Application for the 1st semester of study: Summer & winter semester'
          , array( 'Application deadline for summer semester: March 1'
                 , 'Application deadline for winter semester: September 1' )
@@ -295,10 +297,9 @@ open_ccbox( 'id=mastro', 'Astrophysics | Master (MSc)' );
                 )
   );
   
-  echo tb('The language of instruction is English. No knowledge of German is required.');
   
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
-  open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
+  open_div('medskips', bold( 'Contact and Course Guidance: ' . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) ) );
   open_div('clear','');
 
 close_ccbox();
