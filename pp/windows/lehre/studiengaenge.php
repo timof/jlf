@@ -274,7 +274,29 @@ close_ccbox();
 
 open_ccbox( 'id=mastro', 'Astrophysics | Master (MSc)' );
   open_div( 'illu', image('astrophysics') );
-  open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
+
+  echo tb( 'Application for the 1st semester of study: Summer & winter semester'
+         , array( 'Application deadline for summer semester: March 1'
+                , 'Application deadline for winter semester: September 1' )
+  );
+  
+  echo tb( 'There is no Numerus Clausus (NC), but application is required via '
+          . html_alink( 'http://www.uni-potsdam.de/en/studium/application-enrollment'
+                      , array( 'class' => 'href outlink', 'text' => 'Online-portal uni-assist e.V' )
+            )
+  );
+  
+  echo tb(' Admission Requirements:'
+         , array( 'Undergraduate academic degree in physics adding up to 180 CP; academic degrees in other scientific subjects, provided 
+                   they are related to physics. Proof of knowledge in the fields of physics and mathematics adding up to 60 CP, at least 6 CP of which in astrophysics.'
+                ,  'English language skills | at least C1 (CEFR): Evidenced by: UNIcert-III, TOEFL (iBT: at least 95 points),
+                    Cambridge certificate of Advanced English (at least a grade of B), IELTS (at least 6.5 points and at least 6.0 in each field)'
+                ,  'Certificate of a degree from an English-language degree program or comparable proof Feature'
+                )
+  );
+  
+  echo tb('The language of instruction is English. No knowledge of German is required.');
+  
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
   open_div('clear','');
