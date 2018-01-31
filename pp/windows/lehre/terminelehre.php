@@ -206,7 +206,7 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
        open_td();
          open_span( 'block', '15.02.' );
          open_span( 'block', '10-12 Uhr' );
-         open_span( 'block', '2.28.0.108' );
+         open_span( 'block bold red', 'neu: 2.27.0.01' );
        open_td();
          open_span( 'block', '05.04.' );
          open_span( 'block', '10-12 Uhr' );
@@ -248,7 +248,7 @@ open_ccbox( '', we('Dates in Winter Term 2017/18',"Termine im Wintersemester 201
         open_td();
           open_span( 'block', '15.02.' );
           open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '2.28.0.108' );
+          open_span( 'block bold red', 'neu: 2.27.0.01' );
         open_td();
           open_span( 'block', '' );
           open_span( 'block', '' );
