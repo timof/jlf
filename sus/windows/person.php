@@ -26,6 +26,8 @@ if( $action === 'nop' ) {
   } else {
     need_priv( 'books', 'read' );
   }
+} else if( ( $action === 'save_pw') ) {
+  need_priv( 'person', 'password', $people_id );
 } else {
   need_priv( 'books', 'write' );
 }
@@ -138,13 +140,14 @@ while( $reinit ) {
 
   // handle actions:
   //
-  handle_actions( array( 'reset', 'save', 'init', 'template', 'deletePerson' ) ); 
+  handle_actions( array( 'reset', 'save', 'save_pw', 'init', 'template', 'deletePerson' ) ); 
   switch( $action ) {
     case 'template':
       $people_id = 0;
       $edit_pw = $edit_account = 0;
       break;
 
+    case 'save_pw':
     case 'save':
       if( ! $problems ) {
         if( $edit_pw ) {
@@ -158,6 +161,9 @@ while( $reinit ) {
               $info_messages[] = we('password has been changed','Passwort wurde geändert');
             }
           }
+        }
+        if( $action != 'save' ) {
+          break;
         }
 
         $values = array();
@@ -375,6 +381,8 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     if( have_priv( 'people','write', $people_id ) ) {
       echo reset_button_view();
       echo save_button_view();
+    } else if( $edit_pw && ( $options & OPTION_SHOW_ACCOUNT ) ) {
+      echo save_button_view( 'action=save_pw' );
     }
   close_div();
 
