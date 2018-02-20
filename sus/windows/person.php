@@ -311,7 +311,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     
         open_fieldset('line'
         , label_element( $f['uid'], '', we('user id:','Benutzerkennung:') )
-        , string_element( $f['uid'] )
+        , string_element( $f['uid']['value'] )
         );
     
         open_fieldset('line', we('password:','Password:') );
