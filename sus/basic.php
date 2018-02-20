@@ -89,12 +89,26 @@ function have_priv( $section, $action, $item = 0 ) {
           if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
             return true;
           }
+      }
+      return false;
+
+    case 'person':
+      switch( "$action" ) {
+        case 'account':
           return false;
+        case 'password':
+          if( $item ) {
+            $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
+            if( $person['people_id'] === $login_people_id ) {
+              return true;
+            }
+          } else {
+            return false;
+          }
         default:
-          return false;
+          // fall-through...
       }
     case 'books':
-    case 'person':
     case 'people':
     case 'things':
     case 'hauptkonten':
@@ -152,21 +166,8 @@ function have_priv( $section, $action, $item = 0 ) {
           return false;
       }
   }
-  switch( "$section,$action" ) {
-    case 'person,account':
-      return false;
-    case 'person,password':
-      if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
-        if( $person['people_id'] === $login_people_id ) {
-          return true;
-        }
-      }
-      return false;
-    default:
-      error( "undefined priv query: [$section,$action]", LOG_FLAG_CODE, 'privs' );
-  }
 
+  error( "undefined priv query: [$section,$action]", LOG_FLAG_CODE, 'privs' );
   return false;
 }
 
