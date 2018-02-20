@@ -323,7 +323,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         close_fieldset();
   
       } else {
-        open_div('smallskips', "Benutzerkennung: {$f['uid']}" ); 
+        open_div('smallskips', "Benutzerkennung: {$f['uid']['value']}" ); 
       }
   
       if( $edit_pw ) {
