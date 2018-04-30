@@ -194,19 +194,19 @@ open_ccbox( '', we('Dates in Summer term 2018',"Termine im Sommersemester 2018")
 //         open_span( 'block', '9.15-13 Uhr' );
 //         open_span( 'block', '2.28.2.123' );
 //   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Bargheer' );
-//         open_span( 'block', 'Experimentalphysik II' );
-//         open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
-//       open_td();
-//         open_span( 'block', '31.07.' );
-//         open_span( 'block', '10-12 Uhr' );
-//         open_span( 'block', '' );
-//       open_td();
-//         open_span( 'block', '18.09.' );
-//         open_span( 'block', '10-12 Uhr' );
-//         open_span( 'block', '' );
+    open_tr();
+      open_td();
+        open_span( 'block', 'M. Bargheer' );
+        open_span( 'block', 'Experimentalphysik II' );
+        open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
+      open_td();
+        open_span( 'block', '30.07.' );
+        open_span( 'block', '10-12 Uhr' );
+        open_span( 'block', '' );
+      open_td();
+        open_span( 'block', '24.09.' );
+        open_span( 'block', '10-12 Uhr' );
+        open_span( 'block', '' );
 //   
 //     open_tr();
 //       open_td();
