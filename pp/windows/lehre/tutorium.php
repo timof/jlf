@@ -14,18 +14,19 @@ close_div();
 
 open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
   open_div( 'illu', image( 'tutorium' ) );
-  echo "
-    Tutorien werden unter der Woche von Studierenden höherer Semester angeboten.
-    Dort können unter Anleitung Übungsaufgaben gerechnet oder Fragen zu Vorlesungsinhalten
-    und auch darüber hinaus gestellt werden.
-    Die Teilnahme ist freiwillig, doch alle Studienanfänger_innen sind herzlich willkommen,
-    dieses Angebot wahrzunehmen!
-  ";
+  open_div( 'medskips', "
+      Tutorien werden unter der Woche von Studierenden höherer Semester angeboten.
+      Dort können unter Anleitung Übungsaufgaben gerechnet oder Fragen zu Vorlesungsinhalten
+      und auch darüber hinaus gestellt werden.
+      Die Teilnahme ist freiwillig, doch alle Studienanfänger_innen sind herzlich willkommen,
+      dieses Angebot wahrzunehmen!
+    "
+  );
 
   open_table( array(
     'class' => 'bigskips th;td:smallskipb;qquads;oneline th:black;bold;solidtop'
   , 'id' => 'tutorium'
-  , 'caption' => we('Tutorials in Winter term 2017/18','Termine im Wintersemester 2017/18') 
+  , 'caption' => we('Tutorials in Summer term 2018','Termine im Sommersemester 2018') 
   , 'colgroup' => '40% 30% 30%'
   ) );
     open_tr();
@@ -37,24 +38,33 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
        open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1. Semester' );
 
      open_tr();
-      open_td( '', 'Freitag, 12-14 Uhr' );
-      open_td( '', '2.09.013' );
-      open_td( '', 'Markus' );
+      open_td( '', 'Montag, 10-12 Uhr' );
+      open_td( '', '2.28.2.080' );
+      open_td( '', 'Timon' );
 
      open_tr();
-      open_td( '', 'Freitag, 12-14 Uhr' );
-      open_td( '', '2.28.0.102' );
-      open_td( '', 'Timon' );
+      open_td( '', 'Donnerstag, 10-12 Uhr' );
+      open_td( '', '2.28.2.080' );
+      open_td( '', 'Thomas' );
+
 
 //    open_tr();
 //      open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
 
   // 
     open_tr();
-      open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 1.Semester' );
+      open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 2.Semester' );
 
-    open_tr();
-     open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
+     open_tr();
+      open_td( '', 'Mittwoch, 08-10 Uhr' );
+      open_td( '', '2.28.2.080' );
+      open_td( '', 'Jann' );
+
+     open_tr();
+      open_td( '', 'Freitag, 12-14 Uhr' );
+      open_td( '', '2.28.0.020' );
+      open_td( '', 'Markus' );
+
 //     open_tr();
 //       open_td( '', 'Donnerstag, 10-12 Uhr' );
 //       open_td( '', '2.28.2.080' );
