@@ -35,7 +35,7 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
       open_th('', we('tutors',"Tutor_innen") );
 
      open_tr();
-       open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1. Semester' );
+       open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 2. Semester' );
 
      open_tr();
       open_td( '', 'Montag, 10-12 Uhr' );

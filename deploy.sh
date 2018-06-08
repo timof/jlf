@@ -680,6 +680,7 @@ chmod 644 ./pp/windows/institut/labore.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
 chmod 644 ./pp/windows/institut/veranstaltung.php
 chmod 644 ./pp/windows/institut/veranstaltungsarchiv.php
+chmod 644 ./pp/windows/institut/werkstatt.php
 chmod 755 ./pp/windows/lehre
 chmod 600 ./pp/windows/lehre/1einschreibung.php
 chmod 644 ./pp/windows/lehre/1studiengaenge.php

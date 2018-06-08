@@ -38,6 +38,7 @@ $sidenav_map = array(
 //    , 'institutsrat' => 1
 //    , 'pruefungsausschuss' => 1
     , 'labore' => 1
+    , 'werkstatt' => 1
     , 'impressum' => 1
   ) )
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
@@ -112,6 +113,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Safety','Sicherheit');
       $parameters['title'] = we('Safety','Sicherheit');
       $file = 'institut/labore.php';
+      break;
+    case 'werkstatt':
+      $parameters['text'] = we('Workshop','Werkstatt');
+      $parameters['title'] = we('Workshop','Werkstatt');
+      $file = 'institut/werkstatt.php';
       break;
     case 'impressum':
       $parameters['text'] = we('Impressum','Impressum');
