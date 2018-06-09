@@ -10,6 +10,14 @@ open_div('id=teaser');
   close_div();
 close_div();
 
+$group = sql_one_group( 'acronym=werkstatt', 0 );
+$head_link = '(tba)';
+if( $group ) {
+  if( ( $h_id = $group['head_people_id'] ) ) {
+    $head_link = alink_person_view( $h_id );
+  }
+}
+
 if( $GLOBALS['language'] == 'D' ) {
 
   open_ccbox( '', 'Feinmechanische Werkstatt' );
@@ -32,10 +40,9 @@ if( $GLOBALS['language'] == 'D' ) {
     
     open_tag( 'h3', '', 'Wie können Sie Ihre Idee umsetzen?' );
     open_div( 'smallskipb' );
-      echo " Fuellen Sie bitte folgendes Formular aus: ";
-      echo alink_document_view( 'flag_current,flag_publish,tag=de_27b_6' );
-      echo " Das Formular geben Sie abhängig von Ihrem Institut
-             bei folgenden Perso en ab und besprechen die Details der Ausführung:";
+      open_div( '', " Fuellen Sie bitte folgendes Formular aus: " . alink_document_view( 'flag_current,flag_publish,tag=de_27b_6' ) . '.' );
+      open_div( '', " Das Formular geben Sie abhängig von Ihrem Institut
+                      bei folgenden Personen ab und besprechen die Details der Ausführung:" );
       open_ul();
         open_li( '', 'Aus dem Institut für Physik:
                       Formular bei den Ansprechnpartnern der Werkstatt in den Arbeitgruppen abgeben' );
@@ -43,9 +50,9 @@ if( $GLOBALS['language'] == 'D' ) {
                       (jens.bölke@uni-potsdam.de), Haus 2 Raum 0.36 Tel.: 5816' );
         open_li( '', 'Aus allen anderen Instituten der Math.-Nat. Fakultät:
                       Kleinere Aufträge bis zwei Stunden: Formular abgeben bei Mitarbeitern der Werkstatt Haus 27 Raum 0.010;
-                      Größere Aufträge: Formular abgeben bei Herrn Werner Wirges (werner.wirges@uni-potsdam.de), Haus 28 Raum 0.007 Tel 1836' );
+                      Größere Aufträge: Formular abgeben bei ' . $head_link );
       close_ul();
-      echo "Noch Fragen?  kontaktieren Sie bitte Herrn Werner Wirges (werner.wirges@uni-potsdam.de), Haus 28 Raum 0.007 Tel 1836";
+      echo 'Noch Fragen? Kontaktieren Sie bitte ' . $head_link;
     close_div();
 
   close_ccbox();
@@ -70,10 +77,9 @@ if( $GLOBALS['language'] == 'D' ) {
   
     open_tag( 'h3', '', 'How can you realize your parts?' );
     open_div( 'smallskipb' );
-     echo "Please compile the following form: ";
-        echo alink_document_view( 'flag_current,flag_publish,tag=en_27b_6' );
-     echo "  Depending on your institution, we have different contact points for talking
-             about your order and handing in your form:";
+     open_div( '', "Please compile the following form: " . alink_document_view( 'flag_current,flag_publish,tag=en_27b_6' ) . '.' );
+     open_div( '', "  Depending on your institution, we have different contact points for talking
+                      about your order and handing in your form:" );
      open_ul();
        open_li( '', 'For the Institute for Physics and Astronomy:
                      Please hand the form to the workshop-contact persons in the groups' );
@@ -81,9 +87,9 @@ if( $GLOBALS['language'] == 'D' ) {
                      Please hand the form to Jens Bölke (jens.bölke@uni-potsdam.de), Haus 27, Raum 0.36 Tel.: 5816' );
        open_li( '', 'For all other Institutes of the Math.-Nat. Faculty:
                      small parts up to an estimated workload of 2 hours: Please hand the form to any member of the mechanical workshop Haus 27 Raum 0.010;
-                     Larger Items: Please hand the form to Herrn Werner Wirges (werner.wirges@uni-potsdam.de), Haus 28 Raum 0.007 Tel 1836' );
+                     Larger Items: Please hand the form to ' . $head_link );
     close_ul();    
-    echo "Any questions? Please contact Werner Wirges (werner.wirges@uni-potsdam.de), Haus 28 Raum 0.007 Tel 1836";
+    echo 'Any questions? Please contact ' . $head_link;
   
   close_ccbox();
 
