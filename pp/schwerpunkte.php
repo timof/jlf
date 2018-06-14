@@ -110,13 +110,13 @@ if( $p ) {
 }
 
 // $p = sql_person( 'gn=markus,sn=gühr', 'default=0' );
-$p = sql_person( 'gn=ralf,sn=menzel', 'default=0' );
+$p = sql_person( 'gn=matias,sn=bargheer', 'default=0' );
 if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'photonik'
   , 'title' => we('Photonics','Photonik')
-  , 'photoview' => html_img( '/pp/fotos/forschung2.jpg'
-    , we( 'Bright blue laser on optical table','Heller blauer Laser auf optischem Tisch')
+  , 'photoview' => html_img( '/pp/fotos/nopa_mareike.jpg'
+    , we( 'optical table','Optischer Tisch')
     , credits( $p['cn_notitle'] )
     )
   , 'text' => "
