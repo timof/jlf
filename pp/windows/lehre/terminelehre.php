@@ -235,21 +235,21 @@ open_ccbox( '', we('Dates in Summer term 2018',"Termine im Sommersemester 2018")
         open_span( 'block', 'tba' );
         open_span( 'block', '' );
         open_span( 'block', '' );
-//   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Theoretische Physik III Lehramt' );
-//         open_span( 'block', 'MEd Physik, Modul A711' );
-//       open_td();
-//         open_span( 'block', '03.08.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//       open_td();
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//   
+
+    open_tr();
+      open_td();
+        open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Theoretische Physik III Lehramt' );
+        open_span( 'block', 'MEd Physik, Modul A711' );
+      open_td();
+        open_span( 'block', '26.07.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.27.0.01' );
+      open_td();
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+  
   close_table();
   
   open_div( 'smallskips'

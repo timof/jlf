@@ -10,7 +10,10 @@ close_div(); // theOutback
 open_div( 'id=theFooter' );
   open_table( 'css hfill' );
   open_tr();
-    open_td( 'left,style=padding-left:128px;', inlink( 'impressum', 'text=impressum,class=href inlink' ) );
+    open_td( 'left,style=padding-left:128px;' );
+      echo inlink( 'impressum', 'text=impressum,class=href inlink quads' );
+      echo html_alink( 'http://www.uni-potsdam.de/datenschutzerklaerung.html', 'class=href qquads,text=Datenschutz' );
+    close_td();
     open_td( 'right small', sprintf( "page %s: $now_mysql utc", ( $client_is_robot ? 'cached' : 'generated' ) ) );
   close_table();
 close_div();
