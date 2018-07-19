@@ -68,18 +68,18 @@ echo html_tag('p', '', "
 ");
 
 echo html_tag('p', '', "
-  Fotos, soweit nicht im Einzelfall angegeben: Karla Fritze, Audiovisuelles Zentrum/Zentrale Abteilung
+  Fotos, soweit nicht im Einzelfall angegeben: Karla Fritze
 ");
 
-echo html_tag( 'h3', '', 'Datenschutz' );
+echo html_tag( 'h3', '', html_alink( 'http://www.uni-potsdam.de/datenschutzerklaerung.html', 'class=href,text=Datenschutz' ) );
 
-echo "
-  Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
-  Daten möglich.
-  Soweit personenbezogene Daten erfasst werden, geschieht dies nur für den jeweils
-  konkret angegebenen Zweck; eine Weitergabe von Daten an externe Stellen außerhalb
-  der Universität wird ausgeschlossen.
- ";
+// echo "
+//   Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
+//   Daten möglich.
+//   Soweit personenbezogene Daten erfasst werden, geschieht dies nur für den jeweils
+//   konkret angegebenen Zweck; eine Weitergabe von Daten an externe Stellen außerhalb
+//   der Universität wird ausgeschlossen.
+//  ";
 
 
 ?>
