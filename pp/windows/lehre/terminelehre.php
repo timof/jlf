@@ -246,9 +246,9 @@ open_ccbox( '', we('Dates in Summer term 2018',"Termine im Sommersemester 2018")
         open_span( 'block', '10.00 Uhr' );
         open_span( 'block', '2.27.0.01' );
       open_td();
-        open_span( 'block', '' );
-        open_span( 'block', '' );
-        open_span( 'block', '' );
+        open_span( 'block', '27.09.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.28.2.080' );
   
   close_table();
   
