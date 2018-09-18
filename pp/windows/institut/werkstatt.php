@@ -47,7 +47,7 @@ if( $GLOBALS['language'] == 'D' ) {
         open_li( '', 'Aus dem Institut für Physik:
                       Formular bei den Ansprechnpartnern der Werkstatt in den Arbeitgruppen abgeben' );
         open_li( '', 'Aus dem Institut für Erd- und Umweltwissenschaften: Formular abgeben bei Herrn Jens Bölke
-                      (jens.bölke@uni-potsdam.de), Haus 2 Raum 0.36 Tel.: 5816' );
+                      (jboelke@uni-potsdam.de), Haus 27 Raum 0.10, Tel.: 5683' );
         open_li( '', 'Aus allen anderen Instituten der Math.-Nat. Fakultät:
                       Kleinere Aufträge bis zwei Stunden: Formular abgeben bei Mitarbeitern der Werkstatt Haus 27 Raum 0.010;
                       Größere Aufträge: Formular abgeben bei ' . $head_link );
@@ -84,7 +84,7 @@ if( $GLOBALS['language'] == 'D' ) {
        open_li( '', 'For the Institute for Physics and Astronomy:
                      Please hand the form to the workshop-contact persons in the groups' );
        open_li( '', 'For the Institute for Earth- and Environmental Sciences:
-                     Please hand the form to Jens Bölke (jens.bölke@uni-potsdam.de), Haus 27, Raum 0.36 Tel.: 5816' );
+                     Please hand the form to Jens Bölke (jboelke@uni-potsdam.de), Haus 27, Raum 0.10, Tel.: 5683' );
        open_li( '', 'For all other Institutes of the Math.-Nat. Faculty:
                      small parts up to an estimated workload of 2 hours: Please hand the form to any member of the mechanical workshop Haus 27 Raum 0.010;
                      Larger Items: Please hand the form to ' . $head_link );
