@@ -116,152 +116,6 @@ close_ccbox();
 
 
 
-open_ccbox( '', we('Dates in Summer term 2018',"Termine im Sommersemester 2018") );
-
-  echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2018',"Allgemeine Termine im Sommersemester 2018") );
-  
-  open_table('td:smallskipt;smallskipb;quads');
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "03.04. - 06.04." );
-      open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
-  
-  
-    open_tr('td:/smallskipt/medskipt/'); 
-      open_td( 'oneline', html_div( '', '03.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 05.04.', "au{$SZLIG}er 05.04." ) ) );
-      open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Bachelor degree program','Belegen der Lehrveranstaltungen (Bachelorstudiengang)') ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', "05.04." );
-      open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
-  
-  //  open_tr();
-  //    open_td('oneline', "03.11." );
-  //    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', html_div( '', '03.04. - 20.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 05.04.', "au{$SZLIG}er 05.04." ) ) );
-      open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
-  
-    // open_tr();
-      // open_td('oneline', "20.11." );
-      // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
-      
-      open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "09.04 - 20.07." );
-      open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "15.06. - 15.07." );
-      open_td('', we('Period for re-registration for Winter term 2018/19', "R{$uUML}ckmeldung zum Wintersemester 2018/19" ) );
-  	
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "21.07. - 31.07." );
-      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "01.08. - 31.08." );
-      open_td('', we('Summer break', "Sommerpause" ) );
-  
-  	open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "01.09. - 30.09." );
-      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  	
-  close_table();
-  
-  
-  
-  echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2018',"Pr{$uUML}fungstermine im Sommersemester 2018") );
-  
-  open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//   
-//     open_tr();
-//       open_th( '', we( 'course', 'Veranstaltung' ) );
-//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-//   
-    open_tr();
-      open_td();
-        open_span( 'block', 'F. Feudel' );
-        open_span( 'block', 'Mathematische Grundlagen' );
-        open_span( 'block', 'BEd A111, PHY-111LAS' );
-      open_td();
-        open_span( 'block', '12.07.' );
-        open_span( 'block', '14-16 Uhr' );
-        open_span( 'block', '2.28.0.108' );
-      open_td();
-        open_span( 'block', '28.09.' );
-        open_span( 'block', '10-12 Uhr' );
-        open_span( 'block', '2.25.B2.01' );
-  
-    open_tr();
-      open_td();
-        open_span( 'block', 'M. Bargheer' );
-        open_span( 'block', 'Experimentalphysik II' );
-        open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
-      open_td();
-        open_span( 'block', '30.07.' );
-        open_span( 'block', '10-12 Uhr' );
-        open_span( 'block', '' );
-      open_td();
-        open_span( 'block', '24.09.' );
-        open_span( 'block', '10-12 Uhr' );
-        open_span( 'block', '' );
-  
-    open_tr();
-      open_td();
-        open_span( 'block', 'A. Feldmeier' );
-        open_span( 'block', 'Theoretische Physik I - Mechanik' );
-        open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
-      open_td();
-        open_span( 'block', '26.07.' );
-        open_span( 'block', '10-12 Uhr' );
-        open_span( 'block', '2.27.0.01' );
-      open_td();
-        open_span( 'block', '09.10.' );
-        open_span( 'block', '10-12 Uhr' );
-        open_span( 'block', '2.28.0.108' );
-  
-    open_tr();
-      open_td();
-        open_span( 'block', 'M. Wilkens' );
-        open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
-        open_span( 'block', 'BSc 411' );
-      open_td();
-        open_span( 'block', '26.07.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.27.0.01' );
-      open_td();
-        open_span( 'block', '27.09.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.28.2.080' );
-
-    open_tr();
-      open_td();
-        open_span( 'block', 'M. Wilkens' );
-        open_span( 'block', 'Theoretische Physik III Lehramt' );
-        open_span( 'block', 'MEd Physik, Modul A711' );
-      open_td();
-        open_span( 'block', '26.07.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.27.0.01' );
-      open_td();
-        open_span( 'block', '27.09.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.28.2.080' );
-  
-  close_table();
-  
-  open_div( 'smallskips'
-  , we(   '(more dates will be published as soon as they are available)'
-        , "(Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-  );
-
-close_ccbox();
-
-
-
-
 
 
 open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 2018/19") );
@@ -417,6 +271,152 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
   );
 
 close_ccbox();
+
+open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019") );
+
+  echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2019',"Allgemeine Termine im Sommersemester 2019") );
+  
+  open_table('td:smallskipt;smallskipb;quads');
+  
+//     open_tr('td:/smallskipt/medskipt/');
+//       open_td('oneline', "03.04. - 06.04." );
+//       open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
+  
+  
+    open_tr('td:/smallskipt/medskipt/'); 
+      open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 04.04.', "au{$SZLIG}er 04.04." ) ) );
+      open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Bachelor degree program','Belegen der Lehrveranstaltungen (Bachelorstudiengang)') ) );
+      
+    open_tr('td:/smallskipt/medskipt/');
+      open_td( 'oneline', "04.04." );
+      open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
+  
+  //  open_tr();
+  //    open_td('oneline', "03.11." );
+  //    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
+  
+    open_tr('td:/smallskipt/medskipt/');
+      open_td( 'oneline', html_div( '', '01.04. - 20.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 04.04.', "au{$SZLIG}er 04.04." ) ) );
+      open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
+  
+    // open_tr();
+      // open_td('oneline', "20.11." );
+      // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
+      
+      open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "08.04 - 20.07." );
+      open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
+      
+    open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "15.06. - 15.07." );
+      open_td('', we('Period for re-registration for Winter term 2018/19', "R{$uUML}ckmeldung zum Wintersemester 2018/19" ) );
+  	
+    open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "22.07. - 31.07." );
+      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
+  
+    open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "01.08. - 31.08." );
+      open_td('', we('Summer break', "Sommerpause" ) );
+  
+  	open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "01.09. - 30.09." );
+      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
+  	
+  close_table();
+  
+  
+  
+  echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2019',"Pr{$uUML}fungstermine im Sommersemester 2019") );
+  
+//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+//   
+//     open_tr();
+//       open_th( '', we( 'course', 'Veranstaltung' ) );
+//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'F. Feudel' );
+//         open_span( 'block', 'Mathematische Grundlagen' );
+//         open_span( 'block', 'BEd A111, PHY-111LAS' );
+//       open_td();
+//         open_span( 'block', '12.07.' );
+//         open_span( 'block', '14-16 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//       open_td();
+//         open_span( 'block', '28.09.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '2.25.B2.01' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Bargheer' );
+//         open_span( 'block', 'Experimentalphysik II' );
+//         open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
+//       open_td();
+//         open_span( 'block', '30.07.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '24.09.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'A. Feldmeier' );
+//         open_span( 'block', 'Theoretische Physik I - Mechanik' );
+//         open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
+//       open_td();
+//         open_span( 'block', '26.07.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '2.27.0.01' );
+//       open_td();
+//         open_span( 'block', '09.10.' );
+//         open_span( 'block', '10-12 Uhr' );
+//         open_span( 'block', '2.28.0.108' );
+//   
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+//         open_span( 'block', 'BSc 411' );
+//       open_td();
+//         open_span( 'block', '26.07.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.27.0.01' );
+//       open_td();
+//         open_span( 'block', '27.09.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.2.080' );
+// 
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III Lehramt' );
+//         open_span( 'block', 'MEd Physik, Modul A711' );
+//       open_td();
+//         open_span( 'block', '26.07.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.27.0.01' );
+//       open_td();
+//         open_span( 'block', '27.09.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.2.080' );
+//   
+//   close_table();
+  
+  open_div( 'smallskips'
+  , we(   '(dates will be published here as soon as they are available)'
+        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  );
+
+close_ccbox();
+
+
+
 
 
 ?>
