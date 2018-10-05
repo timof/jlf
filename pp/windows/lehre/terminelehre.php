@@ -167,12 +167,12 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2018/19',"Pr{$uUML}fungstermine im Wintersemester 2018/19") );
   // 
   
-//    open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//    
-//      open_tr();
-//        open_th( '', we( 'course', 'Veranstaltung' ) );
-//        open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//        open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+   
+     open_tr();
+       open_th( '', we( 'course', 'Veranstaltung' ) );
+       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
 //    
 //     open_tr();
 //       open_td();
@@ -202,19 +202,19 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
 //          open_span( 'block', '10.15-11.45 Uhr' );
 //          open_span( 'block', '2.27.0.01' );
 // 
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'A. Feldmeier' );
-//          open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
-//          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
-//        open_td();
-//          open_span( 'block', '15.02.' );
-//          open_span( 'block', '10-12 Uhr' );
-//          open_span( 'block', '2.27.0.01' );
-//        open_td();
-//          open_span( 'block', '05.04.' );
-//          open_span( 'block', '10-12 Uhr' );
-//          open_span( 'block', 'tba' );
+     open_tr();
+       open_td();
+         open_span( 'block', 'A. Feldmeier' );
+         open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
+         open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
+       open_td();
+         open_span( 'block', '12.02.' );
+         open_span( 'block', '10-12 Uhr' );
+         open_span( 'block', 'tba' );
+       open_td();
+         open_span( 'block', '02.04.' );
+         open_span( 'block', '10-12 Uhr' );
+         open_span( 'block', 'tba' );
 // 
 //     open_tr();
 //       open_td();
@@ -259,16 +259,16 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
 //           open_span( 'block', '2.28.2.080' );
 //   
 //   
-//   close_table();
+ close_table();
   
-//  open_div( 'smallskips'
-//  , we(   'More dates will be published here as soon as they are available.'
-//        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
-//  );
-  open_div( 'smallskips'
-  , we(   '(exam dates will be published here as soon as they are available.)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-  );
+ open_div( 'smallskips'
+ , we(   'More dates will be published here as soon as they are available.'
+       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+ );
+//   open_div( 'smallskips'
+//   , we(   '(exam dates will be published here as soon as they are available.)'
+//         , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+//   );
 
 close_ccbox();
 
