@@ -26,7 +26,7 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
   open_table( array(
     'class' => 'bigskips th;td:smallskipb;qquads;oneline th:black;bold;solidtop'
   , 'id' => 'tutorium'
-  , 'caption' => we('Tutorials in Summer term 2018','Termine im Sommersemester 2018') 
+  , 'caption' => we('Tutorials in Winter term 2018/19','Termine im Wintersemester 2018/19') 
   , 'colgroup' => '40% 30% 30%'
   ) );
     open_tr();
@@ -35,17 +35,17 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
       open_th('', we('tutors',"Tutor_innen") );
 
      open_tr();
-       open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 2. Semester' );
+       open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1. Semester' );
+
+//      open_tr();
+//       open_td( '', 'Montag, 10-12 Uhr' );
+//       open_td( '', '2.28.2.080' );
+//       open_td( '', 'Timon' );
 
      open_tr();
-      open_td( '', 'Montag, 10-12 Uhr' );
-      open_td( '', '2.28.2.080' );
+      open_td( '', 'Donnerstag, 16-18 Uhr' );
+      open_td( '', '2.28.0.104' );
       open_td( '', 'Timon' );
-
-     open_tr();
-      open_td( '', 'Donnerstag, 10-12 Uhr' );
-      open_td( '', '2.28.2.080' );
-      open_td( '', 'Thomas' );
 
 
 //    open_tr();
@@ -53,17 +53,17 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
 
   // 
     open_tr();
-      open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 2.Semester' );
+      open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 1. Semester' );
 
-     open_tr();
-      open_td( '', 'Mittwoch, 08-10 Uhr' );
-      open_td( '', '2.28.2.080' );
-      open_td( '', 'Jann' );
-
-     open_tr();
-      open_td( '', 'Freitag, 12-14 Uhr' );
-      open_td( '', '2.28.0.020' );
-      open_td( '', 'Markus' );
+//      open_tr();
+//       open_td( '', 'Mittwoch, 08-10 Uhr' );
+//       open_td( '', '2.28.2.080' );
+//       open_td( '', 'Jann' );
+// 
+//      open_tr();
+//       open_td( '', 'Freitag, 12-14 Uhr' );
+//       open_td( '', '2.28.0.020' );
+//       open_td( '', 'Markus' );
 
 //     open_tr();
 //       open_td( '', 'Donnerstag, 10-12 Uhr' );
@@ -78,7 +78,7 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
    
   close_table(); 
   
-  // open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
+  open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
 
   open_div('clear','');
 close_ccbox();
