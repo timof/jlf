@@ -218,6 +218,20 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
 
     open_tr();
       open_td();
+      open_span( 'block', 'R. Metzler' );
+        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
+        open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
+      open_td();
+        open_span( 'block', '22.02.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+      open_td();
+        open_span( 'block', '29.03.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+
+    open_tr();
+      open_td();
         open_span( 'block', 'M. Wilkens' );
         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
         open_span( 'block', 'MSc 711' );
@@ -243,20 +257,7 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
          open_span( 'block', 'tba' );
          open_span( 'block', '' );
          open_span( 'block', '' );
-// 
-//     open_tr();
-//       open_td();
-//       open_span( 'block', 'R. Metzler' );
-//         open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
-//         open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
-//       open_td();
-//         open_span( 'block', '23.02.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//       open_td();
-//         open_span( 'block', '20.03.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
+
 // 
 //     open_tr();
 //       open_td();
@@ -272,20 +273,6 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
 //           open_span( 'block', '' );
 //           open_span( 'block', '' );
 // 
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
-//         open_span( 'block', 'MSc 711' );
-//         open_td();
-//           open_span( 'block', '15.02.' );
-//           open_span( 'block', '10.00 Uhr' );
-//           open_span( 'block', '2.27.0.01' );
-//         open_td();
-//           open_span( 'block', '05.04.' );
-//           open_span( 'block', '10-12 Uhr' );
-//           open_span( 'block', '2.28.2.080' );
-//   
 //   
  close_table();
   
