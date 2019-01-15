@@ -247,6 +247,20 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
      open_tr();
        open_td();
          open_span( 'block', 'M. Wilkens' );
+         open_span( 'block', 'Mathematische Methoden Lehramt' );
+         open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
+       open_td();
+         open_span( 'block', '14.02.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', '2.27.0.01' );
+       open_td();
+         open_span( 'block', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
+
+     open_tr();
+       open_td();
+         open_span( 'block', 'M. Wilkens' );
          open_span( 'block', 'Theoretische Physik III Lehramt' );
          open_span( 'block', 'MEd Physik, Modul A711' );
        open_td();
