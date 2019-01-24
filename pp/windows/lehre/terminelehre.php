@@ -174,19 +174,19 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
        open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
        open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
 //    
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'F. Feudel' );
-//         open_span( 'block', 'Mathematische Grundlagen' );
-//         open_span( 'block', 'BEd A111, PHY-111LAS' );
-//       open_td();
-//         open_span( 'block', '20.07.' );
-//         open_span( 'block', '14-16 Uhr' );
-//         open_span( 'block', '' );
-//       open_td();
-//         open_span( 'block', '27.09.' );
-//         open_span( 'block', '9.15-13 Uhr' );
-//         open_span( 'block', '2.28.2.123' );
+     open_tr();
+       open_td();
+         open_span( 'block', 'F. Feudel' );
+         open_span( 'block', 'Theoretische Physik I' );
+         open_span( 'block', 'BEd A511, PHY-511LAS, ICSPHY-511LAS' );
+       open_td();
+         open_span( 'block', '29.01.' );
+         open_span( 'block', '16.15 Uhr' );
+         open_span( 'block', '2.28.0.108' );
+       open_td();
+         open_span( 'block', '22.03.' );
+         open_span( 'block', '13.00 Uhr' );
+         open_span( 'block', '' );
 //   
 //      open_tr();
 //        open_td();
@@ -214,7 +214,7 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
        open_td();
          open_span( 'block', '02.04.' );
          open_span( 'block', '10-12 Uhr' );
-         open_span( 'block', 'tba' );
+         open_span( 'block', '' );
 
     open_tr();
       open_td();
