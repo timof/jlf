@@ -186,7 +186,7 @@ open_ccbox( '', we('Dates in Winter Term 2018/19',"Termine im Wintersemester 201
        open_td();
          open_span( 'block', '22.03.' );
          open_span( 'block', '13.00 Uhr' );
-         open_span( 'block', '' );
+         open_span( 'block', '2.25B0.01' );
 //   
 //      open_tr();
 //        open_td();
