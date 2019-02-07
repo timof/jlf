@@ -74,7 +74,7 @@ function image( $tag, $opts = array() ) {
       );
     case 'lehre':
       return html_img( '/pp/fotos/lehreh27a.jpg'
-      , adefault( $opts, 'alt', we('Physics lecture in large lecture hall', 'Physikvorlesung im großsen Hörsaal'))
+      , adefault( $opts, 'alt', we('Physics lecture in large lecture hall', 'Physikvorlesung im großen Hörsaal'))
       , ( $credits === true ? credits('Carsten Beta') : $credits )
       , $opts
       );
