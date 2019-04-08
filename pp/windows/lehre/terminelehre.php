@@ -176,13 +176,13 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
   
   echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2019',"Pr{$uUML}fungstermine im Sommersemester 2019") );
   
-//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//   
-//     open_tr();
-//       open_th( '', we( 'course', 'Veranstaltung' ) );
-//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-//   
+  open_table('td:smallskipt;smallskipb;qquads;solidtop');
+  
+    open_tr();
+      open_th( '', we( 'course', 'Veranstaltung' ) );
+      open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+      open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+  
 //     open_tr();
 //       open_td();
 //         open_span( 'block', 'F. Feudel' );
@@ -225,19 +225,19 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
 //         open_span( 'block', '10-12 Uhr' );
 //         open_span( 'block', '2.28.0.108' );
 //   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
-//         open_span( 'block', 'BSc 411' );
-//       open_td();
-//         open_span( 'block', '26.07.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.27.0.01' );
-//       open_td();
-//         open_span( 'block', '27.09.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.2.080' );
+     open_tr();
+       open_td();
+         open_span( 'block', 'M. Wilkens' );
+         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+         open_span( 'block', 'BSc 411' );
+       open_td();
+         open_span( 'block', '25.07.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', '2.27.1.01' );
+       open_td();
+         open_span( 'block', '26.09.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', 'tba' );
 // 
 //     open_tr();
 //       open_td();
@@ -253,11 +253,11 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
 //         open_span( 'block', '10.00 Uhr' );
 //         open_span( 'block', '2.28.2.080' );
 //   
-//   close_table();
+   close_table();
   
   open_div( 'smallskips'
-  , we(   '(dates will be published here as soon as they are available)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  , we(   '(More dates will be published here as soon as they are available)'
+        , "(Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
   );
 
 close_ccbox();
