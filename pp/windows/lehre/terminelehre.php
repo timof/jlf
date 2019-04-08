@@ -195,7 +195,7 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
       open_td();
         open_span( 'block', '26.09.' );
         open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.27.1.01' );
+        open_span( 'block', 'tba' );
   
 //     open_tr();
 //       open_td();
