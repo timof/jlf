@@ -183,20 +183,20 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'F. Feudel' );
-//         open_span( 'block', 'Mathematische Grundlagen' );
-//         open_span( 'block', 'BEd A111, PHY-111LAS' );
-//       open_td();
-//         open_span( 'block', '12.07.' );
-//         open_span( 'block', '14-16 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//       open_td();
-//         open_span( 'block', '28.09.' );
-//         open_span( 'block', '10-12 Uhr' );
-//         open_span( 'block', '2.25.B2.01' );
-//   
+    open_tr();
+      open_td();
+        open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Mathematische Grundlagen (Lehramt)' );
+        open_span( 'block', 'BEd A111, PHY-111LAS' );
+      open_td();
+        open_span( 'block', '25.07.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.27.1.01' );
+      open_td();
+        open_span( 'block', '26.09.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.27.1.01' );
+  
 //     open_tr();
 //       open_td();
 //         open_span( 'block', 'M. Bargheer' );
@@ -390,19 +390,19 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
 //           open_span( 'block', '10.00 Uhr' );
 //           open_span( 'block', '2.28.2.080' );
 // 
-// //      open_tr();
-// //        open_td();
-// //          open_span( 'block', 'M. Wilkens' );
-// //          open_span( 'block', 'Mathematische Methoden Lehramt' );
-// //          open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
-// //        open_td();
-// //          open_span( 'block', '14.02.' );
-// //          open_span( 'block', '10.00 Uhr' );
-// //          open_span( 'block', '2.27.0.01' );
-// //        open_td();
-// //          open_span( 'block', 'tba' );
-// //          open_span( 'block', '' );
-// //          open_span( 'block', '' );
+//      open_tr();
+//        open_td();
+//          open_span( 'block', 'M. Wilkens' );
+//          open_span( 'block', 'Mathematische Methoden Lehramt' );
+//          open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
+//        open_td();
+//          open_span( 'block', '14.02.' );
+//          open_span( 'block', '10.00 Uhr' );
+//          open_span( 'block', '2.27.0.01' );
+//        open_td();
+//          open_span( 'block', 'tba' );
+//          open_span( 'block', '' );
+//          open_span( 'block', '' );
 // 
 //      open_tr();
 //        open_td();
