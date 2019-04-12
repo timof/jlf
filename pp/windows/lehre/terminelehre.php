@@ -211,20 +211,20 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
 //         open_span( 'block', '10-12 Uhr' );
 //         open_span( 'block', '' );
 //   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'A. Feldmeier' );
-//         open_span( 'block', 'Theoretische Physik I - Mechanik' );
-//         open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
-//       open_td();
-//         open_span( 'block', '26.07.' );
-//         open_span( 'block', '10-12 Uhr' );
-//         open_span( 'block', '2.27.0.01' );
-//       open_td();
-//         open_span( 'block', '09.10.' );
-//         open_span( 'block', '10-12 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//   
+    open_tr();
+      open_td();
+        open_span( 'block', 'A. Feldmeier' );
+        open_span( 'block', 'Theoretische Physik I - Mechanik' );
+        open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
+      open_td();
+        open_span( 'block', '23.07.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.12.0.01' );
+      open_td();
+        open_span( 'block', '24.09.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.28.0.108' );
+  
      open_tr();
        open_td();
          open_span( 'block', 'M. Wilkens' );
@@ -237,7 +237,7 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
        open_td();
          open_span( 'block', '26.09.' );
          open_span( 'block', '10.00 Uhr' );
-         open_span( 'block', '' );
+         open_span( 'block', 'tba' );
 // 
 //     open_tr();
 //       open_td();
