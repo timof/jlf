@@ -103,7 +103,7 @@ if( $rooms_id ) {
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     $filters['groups_id'] = $login_groups_ids;
   }
-  open_fieldset( 'line'
+  open_fieldset( 'line qquadl'
   , label_element( $f['groups_id'], '', we('room belongs to group:','zugeordnet zu Gruppe:') )
   , selector_groups( $f['groups_id'], array( 'filters' => $filters ) )
   );

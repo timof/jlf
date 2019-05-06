@@ -22,6 +22,15 @@ open_ul('plain');
 close_ul('plain');
 // close_div();
 
+if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_EXTERNALLYFUNDED ) ) ) ) {
+  open_tag('h2', '', we('Externally-funded Professors:',"Drittmittelfinanzierte Professuren:") );
+  open_ul('plain');
+    foreach( $profs as $p ) {
+      open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
+    }
+  close_ul('plain');
+}
+
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_SPECIAL ) ) ) ) {
   // open_div('column');
   open_tag('h2', '', we('Auxiliary Professors:',"Au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professuren:") );
@@ -56,14 +65,12 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
 }
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_EXTERNAL ) ) ) ) {
-  // open_div('column');
   open_tag('h2', '', we('External Professors:',"Professuren mit Zweitmitgliedschaft:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
     }
   close_ul('plain');
-  // close_div();
 }
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_SENIOR ) ) ) ) {
