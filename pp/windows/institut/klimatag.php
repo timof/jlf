@@ -147,7 +147,7 @@ open_div( 'qquadl bigskipb' );
   open_table( 'medskips css td:qquadr' );
     open_tr( 'td:Large;bold;oneline' );
       open_td( '', '14:00 Uhr' );
-      open_td( '', 'Johan Rockström (AWI): Einführung zur Podiumsdiskussion' );
+      open_td( '', 'Johan Rockström (PIK): Einführung zur Podiumsdiskussion' );
     close_tr();
     open_tr( 'td:Large;bold;oneline;medskipt' );
       open_td( '', '' );
