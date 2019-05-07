@@ -111,7 +111,7 @@ open_div( 'qquadl bigskipb' );
     close_tr();
     open_tr( 'td:Large;bold' );
       open_td( '', '' );
-      open_td( 'italic', 'Klimawandel und die Polarregionen' );
+      open_td( 'italic', 'Die dramatische Erwärmung der Arktis - Was geht uns das an und was können wir tun?' );
     close_tr();
 //     open_tr( 'td:medskipt' );
 //       open_td( '', '' );
