@@ -11,6 +11,12 @@ open_div('id=teaser');
   close_div();
 close_div();
 
+if( $events_id == 113 ) {
+  require_once( 'pp/windows/institut/klimatag.php' );
+  return;
+}
+ 
+
 if( ! ( $event = sql_one_event( "events_id=$events_id,flag_publish", 0 ) ) ) {
   open_div( 'warn', 'query failed - no such event' );
   return;
@@ -122,6 +128,10 @@ if( $events_id == 79 ) {
      echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016d.jpg' );
      echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016e.jpg' );
 
+} else if( $events_id == 9999 ) {
+
+  require_once( '/pp/windows/institut.klimatag.php' );
+  
 } else { 
   echo event_view( $event, 'format=detail' );
 }

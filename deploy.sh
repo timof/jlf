@@ -676,6 +676,7 @@ chmod 644 ./pp/windows/institut/gremien.php
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/irat.php
+chmod 644 ./pp/windows/institut/klimatag.php
 chmod 644 ./pp/windows/institut/labore.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
 chmod 644 ./pp/windows/institut/veranstaltung.php
