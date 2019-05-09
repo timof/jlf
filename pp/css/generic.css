@@ -245,6 +245,7 @@ th, .th {
 .inline_block { display:inline-block; }
 
 .bold         { font-weight:bold !important; }
+.medium       { font-weight:500 !important; }
 .italic       { font-style:italic !important; }
 .underline    { text-decoration:underline !important; }
 .nounderlinee { text-decoration:none !important; }

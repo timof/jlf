@@ -32,40 +32,45 @@ open_ccbox( '', 'Klimatag am 17. Juni 2019' );
       Das Institut für Physik und Astronomie der Universität Potsdam bietet am
       17. Juni 2019 einen "Klimatag"
       für Schülerinnen, Schüler und die
-      interessierte Öffentlichkeit an. Wir haben Potsdamer Wissenschaftler
-      gewonnen, die vom aktuellen Stand der Forschung berichten werden:
+      interessierte Öffentlichkeit an.
+      Wissenschaftler der Universität und von Potsdamer Forschungseinrichtungen werden
+      über
+      den Stand der Forschung zu diesem aktuellen Thema berichten.
     ';
 
-    open_ul( 'qquadl' );
-      open_li( '', '
-        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt.
-      ' );
-      open_li( '', '
-        Axel Bronstert (Uni Potsdam, Umweltwissenschaften und Geographie) nimmt mit
-        seinem Vortrag zu Wasserressourcen die aktuelle Sorge auf, der Region
-        Brandenburg stehe 2019 erneut ein trockener Sommer ins Haus. 
-      ' );
-      open_li( '', '
-        Markus Rex (Alfred-Wegener-Institut für Polarforschung) hat bereits Dutzende von
-        Expeditionen ins Nordpolarmeer hinter sich, wo die klimatischen Veränderungen
-        besonders sichtbar sind.
-      ' );
-      open_li( '', '
-        Dieter Neher (Uni Potsdam, Physik und Astronomie) stellt
-        aktuelle Entwicklungen und Herausforderungen in der fossilfreien
-        Energiegewinnung vor.
-      ' );
-      open_li( '', '
-        Johan Rockström (Direktor am PIK) fasst in einem
-        Impulsreferat die aktuellen Herausforderungen für Wissenschaft und Gesellschaft
-        zusammen und eröffnet die Podiumsdiskussion.
-      ' );
-    close_ul();
+//     open_ul( 'qquadl' );
+//       open_li( '', '
+//         Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt.
+//       ' );
+//       open_li( '', '
+//         Axel Bronstert (Uni Potsdam, Umweltwissenschaften und Geographie) nimmt mit
+//         seinem Vortrag zu Wasserressourcen die aktuelle Sorge auf, der Region
+//         Brandenburg stehe 2019 erneut ein trockener Sommer ins Haus. 
+//       ' );
+//       open_li( '', '
+//         Markus Rex (Alfred-Wegener-Institut für Polarforschung) hat bereits Dutzende von
+//         Expeditionen ins Nordpolarmeer hinter sich, wo die klimatischen Veränderungen
+//         besonders sichtbar sind.
+//       ' );
+//       open_li( '', '
+//         Dieter Neher (Uni Potsdam, Physik und Astronomie) stellt
+//         aktuelle Entwicklungen und Herausforderungen in der fossilfreien
+//         Energiegewinnung vor.
+//       ' );
+//       open_li( '', '
+//         Johan Rockström (Direktor am PIK) fasst in einem
+//         Impulsreferat die Herausforderungen für Wissenschaft und Gesellschaft
+//         zusammen und eröffnet die Podiumsdiskussion.
+//       ' );
+//     close_ul();
 
     echo '
       Es besteht die Gelegenheit, Fragen zu stellen, und im Rahmen einer
       Podiumsdiskussion sollen kontroverse Standpunkte beleuchtet werden. Die
-      Vorträge werden ab den Jahrgangsstufen 10 bis 13 allgemein verständlich
+      Vortr�
+      wenden sich vorrangig an Schülerinnen
+      und Schüler
+      der Jahrgangsstufen 10 bis 13 und werden allgemein verständlich
       sein.
     ';
   close_div();
@@ -79,25 +84,38 @@ open_div( 'qquadl bigskipb' );
   open_div( 'medskips Large', 'Vormittag: Vortragsreihe (Audimax 1.08.1.45)' );
 
   open_table( 'medskips css td:qquadr' );
-    open_tr( 'td:Large;bold;oneline' );
+    open_tr( 'td:Large;medium;oneline' );
       open_td( '', '09:30 Uhr' );
       open_td( '', 'Stefan Rahmstorf (PIK)' );
     close_tr();
-    open_tr( 'td:Large;bold' );
+    open_tr( 'td:Large;medium' );
       open_td( '', '' );
       open_td( 'italic', 'Was ist los mit unserem Klima? Die wichtigsten Fakten zur globalen Erwärmung' );
+    close_tr();
+    open_tr( 'td:smallskipt' );
+      open_td( '', '' );
+      open_td( '', '
+        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt
+      ' );
     close_tr();
   close_table();
 
 
   open_table( ' medskips css td:qquadr' );
-    open_tr( 'td:Large;bold;oneline' );
+    open_tr( 'td:Large;medium;oneline' );
       open_td( '', '10:15 Uhr' );
       open_td( '', 'Axel Bronstert (UP)' );
     close_tr();
-    open_tr( 'td:Large;bold' );
+    open_tr( 'td:Large;medium' );
       open_td( '', '' );
       open_td( 'italic', 'Wasserresourcen und klimatische Veränderungen - auf was müssen wir uns einstellen?' );
+    close_tr();
+    open_tr( 'td:smallskipt' );
+      open_td( '', '' );
+      open_td( '', 'Axel Bronstert (Uni Potsdam, Umweltwissenschaften und Geographie) nimmt mit
+        seinem Vortrag zu Wasserressourcen die aktuelle Sorge auf, der Region
+        Brandenburg stehe 2019 erneut ein trockener Sommer ins Haus
+      ' );
     close_tr();
   close_table();
 
@@ -105,13 +123,21 @@ open_div( 'qquadl bigskipb' );
   open_div( 'medskips Large', '--- Pause ---' );
 
   open_table( 'medskips css td:qquadr' );
-    open_tr( 'td:Large;bold;oneline' );
+    open_tr( 'td:Large;medium;oneline' );
       open_td( '', '11:15 Uhr' );
       open_td( '', 'Markus Rex (AWI)' );
     close_tr();
-    open_tr( 'td:Large;bold' );
+    open_tr( 'td:Large;medium' );
       open_td( '', '' );
       open_td( 'italic', 'Die dramatische Erwärmung der Arktis - Was geht uns das an und was können wir tun?' );
+    close_tr();
+    open_tr( 'td:smallskipt' );
+      open_td( '', '' );
+      open_td( '', '
+        Markus Rex (Alfred-Wegener-Institut für Polarforschung) hat bereits Dutzende von
+        Expeditionen ins Nordpolarmeer hinter sich, wo die klimatischen Veränderungen
+        besonders sichtbar sind.
+      ' );
     close_tr();
 //     open_tr( 'td:medskipt' );
 //       open_td( '', '' );
@@ -129,13 +155,20 @@ open_div( 'qquadl bigskipb' );
 
   
   open_table( 'medskips css td:qquadr' );
-    open_tr( 'td:Large;bold;oneline' );
+    open_tr( 'td:Large;medium;oneline' );
       open_td( '', '12:00 Uhr' );
       open_td( '', 'Dieter Neher (UP)' );
     close_tr();
-    open_tr( 'td:Large;bold' );
+    open_tr( 'td:Large;medium' );
       open_td( '', '' );
       open_td( 'italic', 'Energie ohne Emission: Forschung an Energiematerialien' );
+    open_tr( 'td:smallskipt' );
+      open_td( '', '' );
+      open_td( '', '
+        Dieter Neher (Uni Potsdam, Physik und Astronomie) stellt
+        aktuelle Entwicklungen und Herausforderungen in der fossilfreien
+        Energiegewinnung vor
+      ' );
     close_tr();
   close_table();
 
@@ -145,12 +178,24 @@ open_div( 'qquadl bigskipb' );
   open_div( 'bigskipt medskipb Large', 'Nachmittag: Podiumsdiskussion (Hörsaal 1.11.0.09)' );
 
   open_table( 'medskips css td:qquadr' );
-    open_tr( 'td:Large;bold;oneline' );
-      open_td( '', '14:00 Uhr' );
+    open_tr( 'td:Large;medium;oneline' );
+      open_td( '', '13:45 Uhr' );
       open_td( '', 'Johan Rockström (PIK): Einführung zur Podiumsdiskussion' );
     close_tr();
-    open_tr( 'td:Large;bold;oneline;medskipt' );
+    open_tr( 'td:Large;medium' );
       open_td( '', '' );
+      open_td( 'italic', 'Safeguarding our climate --- from Fridays to future' );
+    close_tr();
+    open_tr( 'td:smallskipt' );
+      open_td( '', '' );
+      open_td( '', '
+        Johan Rockström (Direktor am PIK) fasst in einem
+        Impulsreferat die Herausforderungen für Wissenschaft und Gesellschaft
+        zusammen und eröffnet die Podiumsdiskussio
+      ' );
+    close_tr();
+    open_tr( 'td:Large;medium;oneline;medskipt' );
+      open_td( '', '14:30 Uhr' );
       open_td( '', 'Podiumsdiskussion' );
     close_tr();
     open_tr( '' );
@@ -250,6 +295,15 @@ open_div( 'qquadl bigskipb' );
     close_div();
     
 close_div();
+
+open_div('bigskps'
+, 'Die Veranstaltung wird organisiert von '
+  . alink_person_view( 'gn=dieter,sn=neher' )
+  . ' und '
+  . alink_person_view( 'gn=frank,sn=spahn' )
+  . '.'
+);
+
 
 close_ccbox();
 
