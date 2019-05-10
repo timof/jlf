@@ -67,7 +67,7 @@ open_ccbox( '', 'Klimatag am 17. Juni 2019' );
     echo '
       Es besteht die Gelegenheit, Fragen zu stellen, und im Rahmen einer
       Podiumsdiskussion sollen kontroverse Standpunkte beleuchtet werden. Die
-      Vortr�
+      Vorträge
       wenden sich vorrangig an Schülerinnen
       und Schüler
       der Jahrgangsstufen 10 bis 13 und werden allgemein verständlich
@@ -95,7 +95,7 @@ open_div( 'qquadl bigskipb' );
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
       open_td( '', '
-        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt
+        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt.
       ' );
     close_tr();
   close_table();
@@ -108,13 +108,13 @@ open_div( 'qquadl bigskipb' );
     close_tr();
     open_tr( 'td:Large;medium' );
       open_td( '', '' );
-      open_td( 'italic', 'Wasserresourcen und klimatische Veränderungen - auf was müssen wir uns einstellen?' );
+      open_td( 'italic', 'Wasserresourcen und klimatische Veränderungen --- auf was müssen wir uns einstellen?' );
     close_tr();
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
       open_td( '', 'Axel Bronstert (Uni Potsdam, Umweltwissenschaften und Geographie) nimmt mit
         seinem Vortrag zu Wasserressourcen die aktuelle Sorge auf, der Region
-        Brandenburg stehe 2019 erneut ein trockener Sommer ins Haus
+        Brandenburg stehe 2019 erneut ein trockener Sommer ins Haus.
       ' );
     close_tr();
   close_table();
@@ -129,7 +129,7 @@ open_div( 'qquadl bigskipb' );
     close_tr();
     open_tr( 'td:Large;medium' );
       open_td( '', '' );
-      open_td( 'italic', 'Die dramatische Erwärmung der Arktis - Was geht uns das an und was können wir tun?' );
+      open_td( 'italic', 'Die dramatische Erwärmung der Arktis --- was geht uns das an und was können wir tun?' );
     close_tr();
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
@@ -167,7 +167,7 @@ open_div( 'qquadl bigskipb' );
       open_td( '', '
         Dieter Neher (Uni Potsdam, Physik und Astronomie) stellt
         aktuelle Entwicklungen und Herausforderungen in der fossilfreien
-        Energiegewinnung vor
+        Energiegewinnung vor.
       ' );
     close_tr();
   close_table();
@@ -189,9 +189,9 @@ open_div( 'qquadl bigskipb' );
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
       open_td( '', '
-        Johan Rockström (Direktor am PIK) fasst in einem
-        Impulsreferat die Herausforderungen für Wissenschaft und Gesellschaft
-        zusammen und eröffnet die Podiumsdiskussio
+        Johan Rockström (Direktor am PIK) fasst
+        die Herausforderungen für Wissenschaft und Gesellschaft
+        zusammen und eröffnet die Podiumsdiskussion.
       ' );
     close_tr();
     open_tr( 'td:Large;medium;oneline;medskipt' );
