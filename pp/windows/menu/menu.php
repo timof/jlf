@@ -37,13 +37,13 @@ close_div();
 // news ticker
 //
 $items = array();
-$items[] = html_span( 'tickerline',
-  '11.05.: '
-  . html_alink( 'http://marchforscience.de/auch-in-deiner-stadt/potsdam', array( 'class' => 'href outlink', 'text' => 'March for science' ) )
-  . ' zum '
-  . html_alink( 'http://www.potsdamertagderwissenschaften.de', array( 'class' => 'href outlink', 'text' => 'Tag der Wissenschaften' ) )
-  . ' in Potsdam'
-  );
+// $items[] = html_span( 'tickerline',
+//   '11.05.: '
+//   . html_alink( 'http://marchforscience.de/auch-in-deiner-stadt/potsdam', array( 'class' => 'href outlink', 'text' => 'March for science' ) )
+//   . ' zum '
+//   . html_alink( 'http://www.potsdamertagderwissenschaften.de', array( 'class' => 'href outlink', 'text' => 'Tag der Wissenschaften' ) )
+//   . ' in Potsdam'
+//   );
 
 $events = sql_events(
   array( 'flag_ticker', 'flag_publish', array( '||', 'date=0', "date>=$today_canonical" ) )
