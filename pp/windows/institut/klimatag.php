@@ -198,7 +198,7 @@ open_div( 'qquadl bigskipb' );
       open_td( '', '14:30 Uhr' );
       open_td( '', 'Podiumsdiskussion' );
     close_tr();
-    open_tr( '' );
+    open_tr( 'td:smallskipt' );
       open_td( '', '' );
       open_td( '', '(Teilnehmer N.N.)' );
     close_tr();
