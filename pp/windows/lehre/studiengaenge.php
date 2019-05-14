@@ -235,8 +235,8 @@ open_ccbox( 'id=bscmsc', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bac
                   . " zum Studiengang Master of Science (MSc) in Physik ist "
                   . em( "nicht beschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich.")
               )
-            , we('deadline for application: September 15 (for winter term 2017/18)'
-                ,"Die Bewerbungsfrist zum ersten Fachsemester im Wintersemester 2017/18 ist der 15. September.")
+            , we('deadline for application: September 01 (for winter term 2019/20)'
+                ,"Die Bewerbungsfrist zum ersten Fachsemester im Wintersemester 2019/20 ist der 01. September.")
             , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
                bereits an einer anderen Hochschule oder in einem anderen Fach im Masterstudiengang
                immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von diesen
