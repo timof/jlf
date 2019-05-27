@@ -274,7 +274,8 @@ open_div( 'qquadl bigskipb' );
 
       open_tag( 'p' );
         echo '
-          Teilnehmende Schulklassen bitten wir um Anmeldung bis zum 31.05. an
+        Die Veranstaltung ist offen und eintrittsfrei für
+        alle Interessierten.  Teilnehmende Schulklassen bitten wir um Anmeldung bis zum 31.05. an
           ' . html_span( '', html_obfuscate_email( 'klimatag@physik.uni-potsdam.de' ) ) . '
           unter Angabe von
         ';
