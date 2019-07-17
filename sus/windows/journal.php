@@ -14,7 +14,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=buchungsdatum,relation=>="
 , 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=buchungsdatum,relation=<="
 , 'geschaeftsjahr' => 'type=u,initval='.$geschaeftsjahr_thread
-, 'seite' /* does this make sense here???? */
+, 'seite'
 , 'kontenkreis' => 'auto=1'
 , 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
 , 'flag_ausgefuehrt' => 'type=B,auto=1,initval=1'
@@ -46,9 +46,9 @@ open_div('menubox medskipb');
 //  } else {
 //    unset( $filters['geschaeftsbereich'] );
 //  }
-//  open_tr();
-//    open_th( 'right', 'Seite:' );
-//    open_td( '', filter_seite( $fields['seite'] ) );
+  open_tr();
+    open_th( 'right', 'Seite:' );
+    open_td( '', filter_seite( $fields['seite'] ) );
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
     open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
