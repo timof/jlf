@@ -116,7 +116,7 @@ if( have_priv('*','*') ) {
 }
 
   open_fieldset( '', we('laboratories: ','Labore: ') );
-    roomslist_view( "groups_id=$groups_id,flag_lab", array( 'columns' => array( 'groups_id' => 't=off' ) ) );
+    roomslist_view( "groups_id=$groups_id", array( 'columns' => array( 'groups_id' => 't=off' ) ) );
     if( have_priv( 'rooms', 'create' ) ) {
       open_div( 'smallskips', inlink( 'room_edit', "groups_id=$groups_id,class=button edit,text=".we('add lab','Neues Labor erfassen') ) );
     }
