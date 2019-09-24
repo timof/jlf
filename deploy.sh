@@ -687,6 +687,7 @@ chmod 600 ./pp/windows/lehre/1einschreibung.php
 chmod 644 ./pp/windows/lehre/1studiengaenge.php
 chmod 600 ./pp/windows/lehre/b2
 chmod 644 ./pp/windows/lehre/bed.php
+chmod 644 ./pp/windows/lehre/brueckenkurs.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 644 ./pp/windows/lehre/diplom.php
 chmod 644 ./pp/windows/lehre/einschreibung.php
