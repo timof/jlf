@@ -156,7 +156,7 @@ open_ccbox( '', we('Dates in Summer term 2019',"Termine im Sommersemester 2019")
       
     open_tr('td:/smallskipt/medskipt/');
       open_td('oneline', "15.06. - 15.07." );
-      open_td('', we('Period for re-registration for Winter term 2018/19', "R{$uUML}ckmeldung zum Wintersemester 2018/19" ) );
+      open_td('', we('Period for re-registration for Winter term 2019/20', "R{$uUML}ckmeldung zum Wintersemester 2019/20" ) );
   	
     open_tr('td:/smallskipt/medskipt/');
       open_td('oneline', "22.07. - 31.07." );
@@ -479,7 +479,7 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
       
     open_tr('td:/smallskipt/medskipt/');
       open_td('oneline', "15.06. - 15.07." );
-      open_td('', we('Period for re-registration for Winter term 2018/19', "R{$uUML}ckmeldung zum Wintersemester 2018/19" ) );
+      open_td('', we('Period for re-registration for Winter term 2018/19', "R{$uUML}ckmeldung zum Wintersemester 2020/21" ) );
   	
     open_tr('td:/smallskipt/medskipt/');
       open_td('oneline', "27.07. - 31.07." );
