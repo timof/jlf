@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
     echo image('lehre');
-    echo html_tag( 'h1', '', 'Brückenkurs Mathe für Studienanfänger*innen' );
+    echo html_tag( 'h1', '', 'Einführungsveranstaltungen' );
   close_div();
 close_div();
 
@@ -14,7 +14,7 @@ close_div();
 // echo html_tag( 'h1', '', 'Gemeinsam Lernen - Lernhilfeangebote' );
 
 
-open_ccbox('', 'Auffrischung Mathe für Studienanfänger*innen' );
+open_ccbox('', 'Brückenkurs "Auffrischung Mathe für Studienanfänger*innen"' );
 
   open_div( 'qquads bold medskips', 'Dozenten: ' . alink_person_view( 'cn=martin wilkens,title=prof. dr.', 'class=list' )
                           . ', ' . alink_person_view( 'cn=achim feldmeier', 'class=list' ) );
