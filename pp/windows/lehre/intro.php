@@ -32,7 +32,7 @@ open_ccbox('', 'Brückenkurs "Auffrischung Mathe für Studienanfänger*innen"' )
      open_tr();
       open_td( '', 'Montag, 30.09.2019' );
       open_td( '', '12:15 - 16:45' );
-      open_td( '', '2.28.0.108' );
+      open_td( '', '2.28.0.108 (Institut für Physik und Astronomie, kleiner Physikhörsaal)' );
 
      open_tr();
       open_td( '', 'Dienstag, 01.10.2019' );
