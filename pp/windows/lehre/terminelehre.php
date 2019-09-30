@@ -164,13 +164,13 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2019/20',"Pr{$uUML}fungstermine im Wintersemester 2019/20") );
   // 
   
-//    open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//    
-//      open_tr();
-//        open_th( '', we( 'course', 'Veranstaltung' ) );
-//        open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//        open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-// //    
+   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+   
+     open_tr();
+       open_th( '', we( 'course', 'Veranstaltung' ) );
+       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+    
 //      open_tr();
 //        open_td();
 //          open_span( 'block', 'F. Feudel' );
@@ -285,16 +285,16 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
 // //           open_span( 'block', '' );
 // // 
 // //   
-//  close_table();
+ close_table();
   
+ open_div( 'smallskips'
+ , we(   'More dates will be published here as soon as they are available.'
+       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+ );
 //  open_div( 'smallskips'
-//  , we(   'More dates will be published here as soon as they are available.'
-//        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+//  , we(   '(Dates will be published here as soon as they are available)'
+//        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
 //  );
-  open_div( 'smallskips'
-  , we(   '(Dates will be published here as soon as they are available)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-  );
 
 close_ccbox();
 
