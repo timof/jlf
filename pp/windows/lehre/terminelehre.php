@@ -199,19 +199,19 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '10.15-11.45 Uhr' );
           open_span( 'block', '2.27.0.01' );
  
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'A. Feldmeier' );
-//          open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
-//          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
-//        open_td();
-//          open_span( 'block bold red', '14.02.' );
-//          open_span( 'block', '10-12 Uhr' );
-//          open_span( 'block', '2.27.0.01' );
-//        open_td();
-//          open_span( 'block', '02.04.' );
-//          open_span( 'block', '10-12 Uhr' );
-//          open_span( 'block', '' );
+      open_tr();
+        open_td();
+          open_span( 'block', 'A. Feldmeier' );
+          open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
+          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
+        open_td();
+          open_span( 'block', '13.02.' );
+          open_span( 'block', '10.00 Uhr' );
+          open_span( 'block', '2.27.0.01' );
+        open_td();
+          open_span( 'block', '07.04.' );
+          open_span( 'block', '10.00 Uhr' );
+          open_span( 'block', '' );
 // 
 //     open_tr();
 //       open_td();
