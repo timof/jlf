@@ -212,21 +212,21 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '07.04.' );
           open_span( 'block', '10.00 Uhr' );
           open_span( 'block', '' );
-// 
-//     open_tr();
-//       open_td();
-//       open_span( 'block', 'R. Metzler' );
-//         open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
-//         open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
-//       open_td();
-//         open_span( 'block', '22.02.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//       open_td();
-//         open_span( 'block', '29.03.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-// 
+
+    open_tr();
+      open_td();
+      open_span( 'block', 'R. Metzler' );
+        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
+        open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
+      open_td();
+        open_span( 'block', '20.01.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+      open_td();
+        open_span( 'block', '30.03.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+
      open_tr();
        open_td();
          open_span( 'block', 'C. Henkel' );
