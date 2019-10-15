@@ -184,21 +184,21 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
 //          open_span( 'block', '22.03.' );
 //          open_span( 'block', '13.00 Uhr' );
 //          open_span( 'block', '2.25B0.01' );
-// //   
-// //      open_tr();
-// //        open_td();
-// //          open_span( 'block', 'R. Gerhard' );
-// //          open_span( 'block', 'Experimentalphysik I' );
-// //          open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
-// //        open_td();
-// //          open_span( 'block', '19.02.' );
-// //          open_span( 'block', '10.15-11.45 Uhr' );
-// //          open_span( 'block', '2.27.0.01' );
-// //        open_td();
-// //          open_span( 'block', '27.03.' );
-// //          open_span( 'block', '10.15-11.45 Uhr' );
-// //          open_span( 'block', '2.27.0.01' );
-// // 
+   
+      open_tr();
+        open_td();
+          open_span( 'block', 'D. Neher' );
+          open_span( 'block', 'Experimentalphysik I' );
+          open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
+        open_td();
+          open_span( 'block', '17.02.' );
+          open_span( 'block', '13.15-14.45 Uhr' );
+          open_span( 'block', '2.27.0.01 und 2.27.1.01' );
+        open_td();
+          open_span( 'block', '24.03.' );
+          open_span( 'block', '10.15-11.45 Uhr' );
+          open_span( 'block', '2.27.0.01' );
+ 
 //      open_tr();
 //        open_td();
 //          open_span( 'block', 'A. Feldmeier' );
@@ -237,8 +237,8 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '10.00 Uhr' );
           open_span( 'block', '2.27.0.01' );
         open_td();
-          open_span( 'block', 'tba' );
-          open_span( 'block', '' );
+          open_span( 'block', '07.04.' );
+          open_span( 'block', '10.00 Uhr' );
           open_span( 'block', '' );
  
 //      open_tr();
