@@ -1472,6 +1472,11 @@ $tables = array(
       , 'default' => ''
       , 'collation' => 'ascii_bin'
       )
+    , 'url_class' => array(
+        'sql_type' => 'varchar(10)'
+      , 'type' => 'w'
+      , 'pattern' => array( 'outlink' => 'outlink', 'inlink' => 'inlink', 'file' => 'file' )
+      )
     , 'type' => array(
          'sql_type' => 'varchar(8)'
        , 'type' => 'W8'
