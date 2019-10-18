@@ -858,7 +858,7 @@ function alink_document_view( $filters, $opts = array() ) {
       switch( $global_format ) {
         case 'html':
           if( $document['url'] ) {
-            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href file' ) );
+            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href '.$document['url_class'] ) );
           } else if( $document['pdf'] ) {
             $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
@@ -902,7 +902,7 @@ function alink_document_view( $filters, $opts = array() ) {
         switch( $global_format ) {
           case 'html':
             if( $d['url'] ) {
-              $items[] = html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href file' ) );
+              $items[] = html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href '.$d['url_class'] ) );
             } else if( $d['pdf'] ) {
               $items[] = inlink( 'download', array(
                 'documents_id' => $d['documents_id']
