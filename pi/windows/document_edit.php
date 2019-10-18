@@ -53,6 +53,7 @@ while( $reinit ) {
     , 'valid_from' => 'u8,size=8,min=19000000,max=29991231,class=number,allow_null=0'
     , 'programme_flags' => 'auto=1'
     , 'url' => 'size=80'
+    , 'url_class' => 'default=outlink'
     , 'pdf' => 'set_scopes='
     , 'flag_current' => 'text='.we('document is current version','Datei ist aktuelle Fassung')
     , 'flag_publish' => 'text='.we('publish document on public pages',"Datei auf {$oUML}ffentlichen Seiten anzeigen")
@@ -186,6 +187,10 @@ if( $documents_id ) {
     open_fieldset( 'line'
     , label_element( $f['url'], 'td', 'Web link:' )
     , string_element( $f['url'] )
+    );
+    open_fieldset( 'line smallskipt'
+    , label_element( $f['url_class'], '', 'type' )
+    , select_element( $f['url_class'], array( 'choices' => $tables['events']['cols']['url_class']['pattern']  ) )
     );
 
 if( $documents_id ) {

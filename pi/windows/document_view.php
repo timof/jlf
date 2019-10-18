@@ -79,8 +79,8 @@ open_fieldset( '' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
         , 'text' => $document['filename']
         ) ) );
       } else if( $document['url'] ) {
-        open_td( '', we('external link:', 'externer Link:' ) );
-        open_td( 'oneline', html_alink( $document['url'], array( 'text' => $document['url'], 'class' => 'href outlink' ) ) );
+        open_td( '', 'URL:' );
+        open_td( 'oneline', html_alink( $document['url'], array( 'text' => $document['url'], 'class' => 'href '.$document['url_class'] ) ) );
       } else {
         open_td( 'warn,colspan=2', we('no document saved (yet):', '(noch) keine Datei gespeichert' ) );
       }
