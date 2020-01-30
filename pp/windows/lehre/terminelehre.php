@@ -227,33 +227,33 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
         open_span( 'block', '' );
         open_span( 'block', '' );
 
-     open_tr();
-       open_td();
-         open_span( 'block', 'C. Henkel' );
-        open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
-        open_span( 'block', 'MSc 711' );
-        open_td();
-          open_span( 'block', '13.02.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '2.27.0.01' );
-        open_td();
-          open_span( 'block', '07.04.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '' );
- 
 //      open_tr();
 //        open_td();
-//          open_span( 'block', 'M. Wilkens' );
-//          open_span( 'block', 'Mathematische Methoden Lehramt' );
-//          open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
-//        open_td();
-//          open_span( 'block', '14.02.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.27.0.01' );
-//        open_td();
-//          open_span( 'block', 'tba' );
-//          open_span( 'block', '' );
-//          open_span( 'block', '' );
+//          open_span( 'block', 'C. Henkel' );
+//         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
+//         open_span( 'block', 'MSc 711' );
+//         open_td();
+//           open_span( 'block', '13.02.' );
+//           open_span( 'block', '10.00 Uhr' );
+//           open_span( 'block', '2.27.0.01' );
+//         open_td();
+//           open_span( 'block', '07.04.' );
+//           open_span( 'block', '10.00 Uhr' );
+//           open_span( 'block', '' );
+ 
+      open_tr();
+        open_td();
+          open_span( 'block', 'M. Wilkens' );
+          open_span( 'block', 'Mathematische Methoden Lehramt' );
+          open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
+        open_td();
+          open_span( 'block', '12.03.' );
+          open_span( 'block', '10.00 Uhr' );
+          open_span( 'block', 'tba' );
+        open_td();
+          open_span( 'block', 'tba' );
+          open_span( 'block', '' );
+          open_span( 'block', '' );
 // 
 //      open_tr();
 //        open_td();
