@@ -11,7 +11,11 @@ open_div('id=teaser');
   close_div();
 close_div();
 
-if( $events_id == 113 ) {
+if( $events_id == 113) {
+  require_once( 'pp/windows/institut/klimatag2019.php' );
+  return;
+}
+if( $events_id == 121 ) {
   require_once( 'pp/windows/institut/klimatag.php' );
   return;
 }
