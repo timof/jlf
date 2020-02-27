@@ -81,6 +81,13 @@ open_div( 'qquadl bigskipb' );
 
   open_table( 'medskips css td:qquadr' );
     open_tr( 'td:Large;medium;oneline' );
+      open_td( '', '09:15 Uhr' );
+      open_td( '', 'Einleitung' );
+    close_tr();
+  close_table();
+
+  open_table( 'medskips css td:qquadr' );
+    open_tr( 'td:Large;medium;oneline' );
       open_td( '', '09:30 Uhr' );
       open_td( '', 'Stefan Rahmstorf' );
     close_tr();
@@ -91,7 +98,7 @@ open_div( 'qquadl bigskipb' );
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
       open_td( '', '
-        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Umkehr des Golfstroms Aufsehen erregt.
+        Stefan Rahmstorf (Potsdamer Institut für Klimafolgenforschung) hat mit seiner Forschung zur Abschwächung des Golfstroms Aufsehen erregt.
       ' );
     close_tr();
   close_table();
@@ -104,7 +111,7 @@ open_div( 'qquadl bigskipb' );
     close_tr();
     open_tr( 'td:Large;medium' );
       open_td( '', '' );
-      open_td( 'italic', 'Polare Eismassen und ihre Klimarolle' );
+      open_td( 'italic', 'Polare Eismassen <==> Einfluss auf das Klima' );
     close_tr();
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
@@ -125,7 +132,7 @@ open_div( 'qquadl bigskipb' );
     close_tr();
     open_tr( 'td:Large;medium' );
       open_td( '', '' );
-      open_td( 'italic', 'Klimawandel und unsere natürlichen Ressourcen' );
+      open_td( 'italic', 'Regionale Folgen des Klimawandels' );
     close_tr();
     open_tr( 'td:smallskipt' );
       open_td( '', '' );
@@ -155,12 +162,18 @@ open_div( 'qquadl bigskipb' );
     close_tr();
   close_table();
 
-  open_div( 'medskips Large', '--- 12:45 - 13:30 Uhr Mittagstisch (Gelegenheit zum Essen in der Mensa am Neuen Palais) ---' );
+  open_div( 'medskips Large', '--- 12:45 - 14:00 Uhr Mittagspause (Gelegenheit zum Essen in der Mensa am Neuen Palais) ---' );
 
   open_table( 'medskips css td:qquadr' );
     open_tr( 'td:Large;medium;oneline' );
-      open_td( '', '13:30 Uhr' );
-      open_td( 'left', html_span( 'Large bold', 'Podiumsdiskussion' ) . ' mit John Schellnhuber (ehemaliger PIK-Direktor)' );
+      open_td( '', '14:00 Uhr' );
+      open_td( '', 'John Schellnhuber (ehemaliger PIK-Direktor)' );
+    open_tr( 'td:Large;medium;oneline' );
+      open_td( '', '' );
+      open_td( '', 'Einführung zur Podiumsdiskussion' );
+    open_tr( 'td:Large;medium;oneline;smallskipt' );
+      open_td( '', '14:20 Uhr' );
+      open_td( '', 'Podiumsdiskussion (60 Minuten)' );
     open_tr( 'td:Large;medium' );
       open_td( '', '' );
       open_td( '', 'Teilnehmende: Schüler*innen, Studierende und Wissenschaftler*innen' );
@@ -186,7 +199,7 @@ open_div( 'qquadl bigskipb' );
         echo ' in Haus 8, Raum 1.45 (Auditorium Maximum)';
 //      open_ul( 'quadl' );
 //        open_li( '', 'vormittags (Vorträge) in Raum 1.45 (Auditorium Maximum) in Haus 8;' );
-//        open_li( '', 'nachmittags (Podiumsdiskussion) in Hörsaal 0.09 in Haus 11.' );
+//        open_li( '', 'nachmittags (Podiumsdiskussion) .' );
 //      close_ul();
 
     close_div();
