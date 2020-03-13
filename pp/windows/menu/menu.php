@@ -37,6 +37,12 @@ close_div();
 // news ticker
 //
 $items = array();
+$items[] = html_span( 'tickerline',
+  html_span( 'bold red', 'abgesagt: ' )
+  . html_alink( '/klimatag', 'class=href inlink,text=Thementag Wissenschaft und Klimawandel am 30.03.' )
+);
+//   '11.05.: '
+//   . html_alink( 'http://marchforscience.de/auch-in-deiner-stadt/potsdam', array( 'class' => 'href outlink', 'text' => 'March for science' ) )
 // $items[] = html_span( 'tickerline',
 //   '11.05.: '
 //   . html_alink( 'http://marchforscience.de/auch-in-deiner-stadt/potsdam', array( 'class' => 'href outlink', 'text' => 'March for science' ) )
