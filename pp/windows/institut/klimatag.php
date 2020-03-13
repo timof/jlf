@@ -15,8 +15,13 @@ if( $deliverable ) switch( $deliverable ) {
 }
 
 
-open_ccbox( '', 'Klimatag am 30. März 2020' );
+open_ccbox( '', html_span( 'red bold', 'Abgesagt: Klimatag am 30. März 2020' ) );
 
+open_div( 'red bold Huge', 
+  'Angesichts der aktuellen Coronavirus-Epidemie
+   müssen wir den Klimatag am 30.03.2020 leider ' . html_span( 'underline', 'absagen' ) .'.
+   Wir bemühen uns um einen späteren Ersatztermin.
+' );
 
   echo html_tag( 'h2', '', 'Wissenschaft und Klimawandel' );
 
