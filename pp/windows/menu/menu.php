@@ -6,6 +6,12 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
   open_div( 'huge', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
   open_ul();
     open_li( '', alink_document_view( 'tag=corona20200316' ) );
+    open_li( ''
+    , we(
+        'General Information from the University can be found on the university web page: '
+      , 'Allgemeine Informationen zu Auswirkungen der Corona-Pandemie finden sie auf der Webseite der  Universität: '
+      ) . html_alink( 'https://www.uni-potsdam.de', 'class=href outlink large,text=https://www.uni-potsdam.de' )
+    );
   close_ul();
 close_div();
 
