@@ -56,9 +56,8 @@ open_div( 'id=theOutback,clear' );
     js_on_exit( "theOutback.scrollTop = $yoff; theOutback.scrollLeft = $xoff; " );
   }
 
-  $parents = adefault( $sidenav_flatmap, $script, array() );
-
-  $n = 0;
+//  $parents = adefault( $sidenav_flatmap, $script, array() );
+//  $n = 0;
 //   $level = count( $parents );
 //   $closelink = inlink( 'menu', 'class=close,text=' );
 //   $p = 'menu';
