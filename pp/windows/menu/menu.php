@@ -2,6 +2,13 @@
 
 sql_transaction_boundary('*');
 
+open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+  open_div( 'huge', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
+  open_ul();
+    open_li( '', alink_document_view( 'tag=corona20200316' ) );
+  close_ul();
+close_div();
+
 open_div('id=teaser');
   open_div( 'class=overlay,id=i1', image( 'lehre', 'alt=' ) );
   open_div( 'class=overlay,id=i2', image( 'forschung', 'alt=' ) );
