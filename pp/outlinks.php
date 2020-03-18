@@ -27,21 +27,20 @@ define( 'URL_INSTGGRAPH_E', 'http://www.geographie.uni-potsdam.de' );
 
 
 
-define( 'URL_FAKJURA_D', 'http://www.uni-potsdam.de/fakultaeten/juristische-fakultaet.html' );
-define( 'URL_FAKJURA_E', 'http://www.uni-potsdam.de/fakultaeten/juristische-fakultaet.html' );
+define( 'URL_FAKJURA_D', 'http://www.uni-potsdam.de/de/jura' );
+define( 'URL_FAKJURA_E', 'http://www.uni-potsdam.de/en/jura' );
 
-define( 'URL_FAKPHIL_D', 'http://www.uni-potsdam.de/fakultaeten/philosophische-fakultaet.html' );
-define( 'URL_FAKPHIL_E', 'http://www.uni-potsdam.de/fakultaeten/philosophische-fakultaet.html' );
+define( 'URL_FAKPHIL_D', 'http://www.uni-potsdam.de/de/philfak' );
+define( 'URL_FAKPHIL_E', 'http://www.uni-potsdam.de/en/philfak' );
 
-define( 'URL_FAKHUM_D', 'http://www.uni-potsdam.de/fakultaeten/humanwissenschaftliche-fakultaet.html' );
-define( 'URL_FAKHUM_E', 'http://www.uni-potsdam.de/fakultaeten/humanwissenschaftliche-fakultaet.html' );
+define( 'URL_FAKHUM_D', 'http://www.uni-potsdam.de/de/humfak' );
+define( 'URL_FAKHUM_E', 'http://www.uni-potsdam.de/en/humfak' );
 
-define( 'URL_FAKWISO_D', 'http://www.uni-potsdam.de/fakultaeten/wirtschafts-und-sozialwissenschaftliche-fakultaet.html' );
-define( 'URL_FAKWISO_E', 'http://www.uni-potsdam.de/fakultaeten/wirtschafts-und-sozialwissenschaftliche-fakultaet.html' );
+define( 'URL_FAKWISO_D', 'http://www.uni-potsdam.de/de/wiso' );
+define( 'URL_FAKWISO_E', 'http://www.uni-potsdam.de/en/wiso' );
 
-define( 'URL_FAKMATNAT_D', 'http://www.uni-potsdam.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet.html' );
-define( 'URL_FAKMATNAT_E', 'http://www.uni-potsdam.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet.html' );
-
+define( 'URL_FAKMATNAT_D', 'http://www.uni-potsdam.de/de/mnfakul' );
+define( 'URL_FAKMATNAT_E', 'http://www.uni-potsdam.de/en/mnfakul' );
 
 
 ?>
