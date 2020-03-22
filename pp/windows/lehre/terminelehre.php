@@ -163,6 +163,22 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
   
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2019/20',"Pr{$uUML}fungstermine im Wintersemester 2019/20") );
   // 
+   open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+     open_div('smallskips', '
+       Klausuren dürfen ab 24.03. bis auf weiteres nicht abgehalten werden, zeitnahe Ersatztermine werden
+       angeboten sobald dies wieder möglich ist.
+     ');
+     open_div('smallskips', '
+       Mündliche Prüfungen können nach Absprache im gegenseitigen Einvernehmen
+       noch durchgeführt werden, ggf. unter Einsatz alternativer
+       Kommunikationswege.
+     ');
+     open_div('smallskips', we(
+        'Information on the consequences of the corona crisis on studies and teaching: '
+      , 'Informationen zu den Auswirkungen der Corona-Krise auf Studium und Lehre: '
+      ) . html_alink( 'https://www.uni-potsdam.de/studium/corona', 'class=href outlink large,text=https://www.uni-potsdam.de/studium/corona' )
+    );
+   close_div();
   
    open_table('td:smallskipt;smallskipb;qquads;solidtop');
    
@@ -181,9 +197,9 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
          open_span( 'block', '12.00 Uhr' );
          open_span( 'block', '2.28.0.108' );
        open_td();
-         open_span( 'block', '25.03.' );
-         open_span( 'block', '10.00 Uhr' );
-         open_span( 'block', '2.28.0.102' );
+         open_span( 'block red bold', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
    
       open_tr();
         open_td();
@@ -195,9 +211,9 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '13.15-14.45 Uhr' );
           open_span( 'block', '2.27.0.01 und 2.27.1.01' );
         open_td();
-          open_span( 'block', '24.03.' );
-          open_span( 'block', '10.15-11.45 Uhr' );
-          open_span( 'block', '2.27.0.01' );
+         open_span( 'block red bold', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
  
       open_tr();
         open_td();
@@ -209,9 +225,9 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '10.00 Uhr' );
           open_span( 'block', '2.27.0.01' );
         open_td();
-          open_span( 'block', '07.04.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '' );
+         open_span( 'block red bold', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
 
     open_tr();
       open_td();
@@ -223,9 +239,9 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
         open_span( 'block', '' );
         open_span( 'block', '' );
       open_td();
-        open_span( 'block', '30.03.' );
-        open_span( 'block', '' );
-        open_span( 'block', '' );
+         open_span( 'block red bold', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
 
 //      open_tr();
 //        open_td();
