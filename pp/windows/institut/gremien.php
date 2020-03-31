@@ -66,10 +66,14 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
           $members = sql_offices( "board=$boardname,function=$fname", 'orderby=rank' );
           foreach( $members as $m ) {
             open_tr();
-              open_td( '', alink_person_view( $m['people_id'], 'office' ) );
-              open_td( '', $m['roomnumber'] );
-              open_td( '', $m['telephonenumber'] );
-              open_td( 'style=max-width:200px;', $m['office_hours'] );
+              open_td( 'top' );
+                open_div( '', alink_person_view( $m['people_id'], 'office' ) );
+                if( ( $boardname == 'examBoardMono' ) && ( $fname == 'chair' ) ) {
+                  open_div( '', 'email: ' . html_obfuscate_email( 'PA-Physik@uni-potsdam.de' ) );
+                }
+              open_td( 'top', $m['roomnumber'] );
+              open_td( 'top', $m['telephonenumber'] );
+              open_td( 'top,style=max-width:200px;', $m['office_hours'] );
           }
       }
     close_table();
