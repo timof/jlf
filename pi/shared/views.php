@@ -328,6 +328,13 @@ function person_visitenkarte_view( $person, $opts = array() ) {
     if( count( $emails ) === 1 ) {
       $s .= html_div( $tr, html_div( $th, 'Email:' ) . html_div( $td, html_obfuscate_email( $emails[ 0 ] ) ) );
     }
+    $m = sql_offices( array( 'board' => 'examBoardMono', 'function' => 'chair', 'people_id' => $people_id ) );
+    if( count( $m ) > 0 ) {
+      $s .= html_div( $tr
+      , html_div( $th, '' )
+        . html_div( $td, html_obfuscate_email( 'PA-Physik@uni-potsdam.de' ) . we( ' (examination board)', ' (Prüfungsausschuss)' ) )
+      );
+    }
     if( $person['url'] ) {
       $s .= html_div( $tr, html_div( $th, 'Web:' ) . html_div( $td, html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) ) );
     }
