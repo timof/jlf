@@ -117,60 +117,17 @@ close_ccbox();
 
 open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 2019/20") );
 
-  echo html_tag('h3', 'medskipt', we('General dates in Winter Term 2019/20',"Allgemeine Termine im Wintersemester 2019/20") );
-  
-  open_table('td:smallskipt;smallskipb;quads');
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "01.10. - 11.10." );
-      open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', html_div( '', '01.10. - 10.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.10.', "au{$SZLIG}er 10.10." ) ) );
-      open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Bachelor degree program','Belegen der Lehrveranstaltungen (Bachelorstudiengang)') ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', "10.10." );
-      open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
-  
-  //  open_tr();
-  //    open_td('oneline', "03.11." );
-  //    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', html_div( '', '01.10. - 20.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.10.', "au{$SZLIG}er 10.10." ) ) );
-      open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
-  
-  //  open_tr();
-  //    open_td('oneline', "20.11." );
-  //    open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
-      
-      open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "14.10. - 07.02." );
-      open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "15.01. - 15.02." );
-      open_td('', we('Period for re-registration for Summer term 2020', "R{$uUML}ckmeldung zum Sommersemester 2020" ) );
-  
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "10.02. - 31.03." );
-      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  
-  close_table();
-  
-  
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2019/20',"Pr{$uUML}fungstermine im Wintersemester 2019/20") );
   // 
    open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
      open_div('smallskips', '
-       Klausuren dürfen ab 24.03. bis auf weiteres nicht abgehalten werden, zeitnahe Ersatztermine werden
-       angeboten sobald dies wieder möglich ist.
+       Klausuren dürfen ab 24.03. bis auf weiteres nicht abgehalten werden.
+       Für noch ausstehende Prüfungen werden zeitnahe Ersatztermine 
+       angeboten, sobald dies wieder möglich ist.
      ');
      open_div('smallskips', '
        Mündliche Prüfungen können nach Absprache im gegenseitigen Einvernehmen
-       noch durchgeführt werden, ggf. unter Einsatz alternativer
+       durchgeführt werden, ggf. unter Einsatz alternativer
        Kommunikationswege.
      ');
      open_div('smallskips', we(
@@ -267,7 +224,7 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
           open_span( 'block', '10.00 Uhr' );
           open_span( 'block', '2.28.0.108' );
         open_td();
-          open_span( 'block', 'tba' );
+          open_span( 'block red bold', 'tba' );
           open_span( 'block', '' );
           open_span( 'block', '' );
 // 
@@ -316,10 +273,15 @@ close_ccbox();
 
 open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020") );
 
-  open_div( 'red bold huge'
+  open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;'
   , 'Die aktuelle Corona-Epidemie wird Auswirkungen auf den Lehrbetrieb im Sommersemester 2020
      haben. Insbesondere wird es bis einschließlich 19.04. keine Präsenzveranstaltungen geben,
-     auch andere der untenstehenden Termine können sich noch verschieben.'
+     auch andere der untenstehenden Termine können sich noch verschieben.
+     Ab wann und unter welchen Bedingungen Präsenzveranstaltungen wieder möglich sein werden
+     ist noch nicht bekannt. Gegebenfalls wird der Lehrbetrieb ab dem 20.04. über alternative
+     Kommunikationswege beginnen; bitte informieren Sie sich auf den Webseiten der jeweiligen
+     Veranstaltung!
+     '
   );
 
   echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2020',"Allgemeine Termine im Sommersemester 2020") );
@@ -332,12 +294,12 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
   
   
     open_tr('td:/smallskipt/medskipt/'); 
-      open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 08.04.', "au{$SZLIG}er 08.04." ) ) );
+      open_td( 'oneline', html_div( '', html_span('red bold','20.04.') . ' - 10.05.' ) ); // . html_div( 'bold red qpadl smaller', we( 'except 08.04.', "au{$SZLIG}er 08.04." ) ) );
       open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses','Belegen der Lehrveranstaltungen') ) );
       
     open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', "08.04." );
-      open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
+      open_td( 'oneline red bold', "24.04., 14 Uhr" );
+      open_td( '', we('Start of admission (no registration possible)', "Beginn der Zulassung (keine Belegung m{$oUML}glich)" ) );
   
   //  open_tr();
   //    open_td('oneline', "03.11." );
@@ -352,7 +314,7 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
       // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
       
       open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "14.04 - 24.07." );
+      open_td('oneline', html_span('red bold', '20.04' ) . ' - 24.07.' );
       open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
       
     open_tr('td:/smallskipt/medskipt/');
