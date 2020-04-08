@@ -33,7 +33,12 @@ echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
      );
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
-  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_PHD ), 'format=list,default=' )
+//  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_PHD ), 'format=list,default=' )
+  we( 'Compilation of course directories as .pdf has been discontinued.
+       Current course directories are available online via '
+     , 'Das kommentierte Vorlesungsverzeichnis als .pdf wurde letztmalig für das Wintersemester 2019/20 erstellt.
+       Aktuelle Vorlesungsverzeichnisse sind nur noch online verfügbar über '
+  ) . html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink' , 'text' => 'PULS' ) )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
