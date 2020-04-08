@@ -278,7 +278,7 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
      haben. Insbesondere wird es bis einschließlich 19.04. keine Präsenzveranstaltungen geben,
      auch andere der untenstehenden Termine können sich noch verschieben.
      Ab wann und unter welchen Bedingungen Präsenzveranstaltungen wieder möglich sein werden
-     ist noch nicht bekannt. Gegebenfalls wird der Lehrbetrieb ab dem 20.04. über alternative
+     ist noch nicht bekannt. Gegebenenfalls wird der Lehrbetrieb ab dem 20.04. über alternative
      Kommunikationswege beginnen; bitte informieren Sie sich auf den Webseiten der jeweiligen
      Veranstaltung!
      '
