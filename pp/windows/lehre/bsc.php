@@ -39,8 +39,13 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma program',"
 // echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
-echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
-  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_BSC ), 'format=list,default=,class=smallskipb' )
+echo tb( we('Course directories','Vorlesungsverzeichnisse'), array(
+//  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_BSC ), 'format=list,default=,class=smallskipb' )
+  we( 'Compilation of course directories as .pdf has been discontinued.
+       Current course directories are available online via '
+     , 'Das kommentierte Vorlesungsverzeichnis als .pdf wurde letztmalig für das Wintersemester 2019/20 erstellt.
+       Aktuelle Vorlesungsverzeichnisse sind nur noch online verfügbar über '
+  ) . html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink' , 'text' => 'PULS' ) )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
