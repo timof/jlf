@@ -3,7 +3,42 @@
 sql_transaction_boundary('*');
 
 open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
-  open_div( 'huge', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
+  open_div('bigpadb');
+    open_tag( 'h1', 'red', 'Liebe Studierende,' );
+    
+    open_tag( 'p', '', '
+      der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag den
+      20. April 2020, allerdings ohne Präsenzveranstaltungen.
+    ');
+    
+    open_tag( 'p', '', '
+      Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
+      angeboten (Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
+      Rückgabe eingescannter Übungsblaetter usw.)
+    ');
+    
+    open_tag( 'p', '', '
+      Wir bitten Sie, sich auf '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+        ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
+        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+        ' zu informieren.
+    ');
+    
+    open_tag( 'p', '', '
+      Bitte besuchen Sie auch die Homepage der jeweiligen '
+        .inlink('professuren', 'class=large bold,text=Dozenten' ).
+      ' oder deren Arbeitsgruppe für weitere Informationen.
+    ');
+    
+    open_tag( 'p', '', '
+      Melden Sie sich bitte nach Beginn der Einschreibefrist am 20.04. so bald wie möglich über '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+      ' an, damit die Veranstalter*innen Sie "sehen".
+    ');
+  close_div();
+
+  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
   open_ul();
     // open_li( '', alink_document_view( 'tag=corona20200316' ) );
     open_li( ''
