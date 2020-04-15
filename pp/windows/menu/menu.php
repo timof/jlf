@@ -29,7 +29,10 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
         ' and in '
         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
         ', as well as on the web page of the respective '
-          .inlink('professuren', 'class=large bold,text=teacher' ).'.
+          .inlink('professuren', 'class=large bold,text=teacher' ).
+        ' or their '
+          .inlink('forschung', 'class=large bold,text=group' ).
+        '.
     ','
       Wir bitten Sie, sich auf '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
@@ -37,7 +40,9 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
         ' zu informieren. Bitte besuchen Sie auch die Webseite der jeweiligen '
           .inlink('professuren', 'class=large bold,text=Dozenten' ).
-        ' oder deren Arbeitsgruppe für weitere Informationen.
+        ' oder deren '
+          .inlink('forschung', 'class=large bold,text=Arbeitsgruppe' ).
+        ' für weitere Informationen.
     ') );
     
     open_tag( 'p', '', we('
@@ -51,7 +56,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
     ') );
   close_div();
 
-  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
+  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen der Universität aufgrund der Corona-Pandemie') );
   open_ul();
     // open_li( '', alink_document_view( 'tag=corona20200316' ) );
     open_li( ''
