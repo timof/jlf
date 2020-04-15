@@ -4,38 +4,51 @@ sql_transaction_boundary('*');
 
 open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
   open_div('bigpadb');
-    open_tag( 'h1', 'red', 'Liebe Studierende,' );
+    open_tag( 'h1', 'red', we('Dear Students,', 'Liebe Studierende,' ) );
     
-    open_tag( 'p', '', '
+    open_tag( 'p', '', we('
+      the lecture period of summer term 2020 will start on Monday, April 20;
+      however, no face-to-face teaching will be possible for the time being and online formats
+      will be used instead: videos, documents in Moodle,
+      Zoom-sessions, handing in of scanned excercise sheets, etc.
+    ','
       der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag den
       20. April 2020, allerdings ohne Präsenzveranstaltungen.
-    ');
-    
-    open_tag( 'p', '', '
       Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
-      angeboten (Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
-      Rückgabe eingescannter Übungsblaetter usw.)
-    ');
+      angeboten: Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
+      Rückgabe eingescannter Übungsblätter etc.
+    ') );
     
-    open_tag( 'p', '', '
+    open_tag( 'p', '', we('
+    ','
+    ') );
+    
+    open_tag( 'p', '', we('
+      Information on individual courses can be found on '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+        ' and in '
+        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+        ', as well as on the web page of the respective '
+          .inlink('professuren', 'class=large bold,text=teacher' ).'.
+    ','
       Wir bitten Sie, sich auf '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
         ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ' zu informieren.
-    ');
+        ' zu informieren. Bitte besuchen Sie auch die Webseite der jeweiligen '
+          .inlink('professuren', 'class=large bold,text=Dozenten' ).
+        ' oder deren Arbeitsgruppe für weitere Informationen.
+    ') );
     
-    open_tag( 'p', '', '
-      Bitte besuchen Sie auch die Homepage der jeweiligen '
-        .inlink('professuren', 'class=large bold,text=Dozenten' ).
-      ' oder deren Arbeitsgruppe für weitere Informationen.
-    ');
-    
-    open_tag( 'p', '', '
+    open_tag( 'p', '', we('
+      Please register for courses as soon as possible via '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+     ' so teachers can "see" you and contact you by email (registration starts on April 20).
+    ','
       Melden Sie sich bitte nach Beginn der Einschreibefrist am 20.04. so bald wie möglich über '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-      ' an, damit die Veranstalter*innen Sie "sehen".
-    ');
+      ' an, damit die Veranstalter*innen Sie "sehen" und Ihnen email schicken können.
+    ') );
   close_div();
 
   open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen aufgrund der Corona-Pandemie') );
