@@ -28,20 +28,20 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
         ' and in '
         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ', as well as on the web page of the respective '
-          .inlink('professuren', 'class=large bold,text=teacher' ).
+        ', as well as on the web pages of the respective '
+          .inlink('professuren', 'class=large bold,text=teachers' ).
         ' or their '
-          .inlink('forschung', 'class=large bold,text=group' ).
+          .inlink('forschung', 'class=large bold,text=groups' ).
         '.
     ','
       Wir bitten Sie, sich auf '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
         ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ' zu informieren. Bitte besuchen Sie auch die Webseite der jeweiligen '
+        ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
           .inlink('professuren', 'class=large bold,text=Dozenten' ).
         ' oder deren '
-          .inlink('forschung', 'class=large bold,text=Arbeitsgruppe' ).
+          .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
         ' für weitere Informationen.
     ') );
     
