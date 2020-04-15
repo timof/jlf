@@ -7,12 +7,12 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
     open_tag( 'h1', 'red', we('Dear Students,', 'Liebe Studierende,' ) );
     
     open_tag( 'p', '', we('
-      the lecture period of summer term 2020 will start on Monday, April 20;
+      the lecture period of summer term 2020 will start on Monday April 20;
       however, no face-to-face teaching will be possible for the time being and online formats
       will be used instead: videos, documents in Moodle,
       Zoom-sessions, handing in of scanned excercise sheets, etc.
     ','
-      der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag den
+      der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag, dem
       20. April 2020, allerdings ohne Präsenzveranstaltungen.
       Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
       angeboten: Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
