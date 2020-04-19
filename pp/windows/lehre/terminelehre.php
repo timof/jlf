@@ -137,150 +137,17 @@ open_ccbox( '', we('Dates in Winter Term 2019/20',"Termine im Wintersemester 201
     );
    close_div();
   
-   open_table('td:smallskipt;smallskipb;qquads;solidtop');
-   
-     open_tr();
-       open_th( '', we( 'course', 'Veranstaltung' ) );
-       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-    
-     open_tr();
-       open_td();
-         open_span( 'block', 'F. Feudel' );
-         open_span( 'block', 'Theoretische Physik I' );
-         open_span( 'block', 'BEd A511, PHY-511LAS, ICSPHY-511LAS' );
-       open_td();
-         open_span( 'block', '03.02.' );
-         open_span( 'block', '12.00 Uhr' );
-         open_span( 'block', '2.28.0.108' );
-       open_td();
-         open_span( 'block red bold', 'tba' );
-         open_span( 'block', '' );
-         open_span( 'block', '' );
-   
-      open_tr();
-        open_td();
-          open_span( 'block', 'D. Neher' );
-          open_span( 'block', 'Experimentalphysik I' );
-          open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
-        open_td();
-          open_span( 'block', '17.02.' );
-          open_span( 'block', '13.15-14.45 Uhr' );
-          open_span( 'block', '2.27.0.01 und 2.27.1.01' );
-        open_td();
-         open_span( 'block red bold', 'tba' );
-         open_span( 'block', '' );
-         open_span( 'block', '' );
- 
-      open_tr();
-        open_td();
-          open_span( 'block', 'A. Feldmeier' );
-          open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
-          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
-        open_td();
-          open_span( 'block', '13.02.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '2.27.0.01' );
-        open_td();
-         open_span( 'block red bold', 'tba' );
-         open_span( 'block', '' );
-         open_span( 'block', '' );
-
-    open_tr();
-      open_td();
-      open_span( 'block', 'R. Metzler' );
-        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
-        open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
-      open_td();
-        open_span( 'block', '20.01.' );
-        open_span( 'block', '' );
-        open_span( 'block', '' );
-      open_td();
-         open_span( 'block red bold', 'tba' );
-         open_span( 'block', '' );
-         open_span( 'block', '' );
-
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'C. Henkel' );
-//         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
-//         open_span( 'block', 'MSc 711' );
-//         open_td();
-//           open_span( 'block', '13.02.' );
-//           open_span( 'block', '10.00 Uhr' );
-//           open_span( 'block', '2.27.0.01' );
-//         open_td();
-//           open_span( 'block', '07.04.' );
-//           open_span( 'block', '10.00 Uhr' );
-//           open_span( 'block', '' );
- 
-      open_tr();
-        open_td();
-          open_span( 'block', 'M. Wilkens' );
-          open_span( 'block', 'Mathematische Methoden Lehramt' );
-          open_span( 'block', 'BEd Physik PHY-111LAS, A111' );
-        open_td();
-          open_span( 'block', '12.03.' );
-          open_span( 'block', '10.00 Uhr' );
-          open_span( 'block', '2.28.0.108' );
-        open_td();
-          open_span( 'block red bold', 'tba' );
-          open_span( 'block', '' );
-          open_span( 'block', '' );
-// 
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'M. Wilkens' );
-//          open_span( 'block', 'Theoretische Physik III Lehramt' );
-//          open_span( 'block', 'MEd Physik, Modul A711' );
-//        open_td();
-//          open_span( 'block', '14.02.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.27.0.01' );
-//        open_td();
-//          open_span( 'block', '04.04.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.28.2.080' );
-// 
-// // 
-// //     open_tr();
-// //       open_td();
-// //         open_span( 'block', 'O. Rader' );
-// //         open_span( 'block', 'Höhere Festkörperphysik' );
-// //         open_span( 'block', 'MSc 701, Nebenfach ICSPHYS741LASe' );
-// //         open_td();
-// //           open_span( 'block', '22.02.' );
-// //           open_span( 'block', '10.00 Uhr' );
-// //           open_span( 'block', '2.28.0.108' );
-// //         open_td();
-// //           open_span( 'block', '' );
-// //           open_span( 'block', '' );
-// //           open_span( 'block', '' );
-// // 
-// //   
- close_table();
-  
-//  open_div( 'smallskips'
-//  , we(   'More dates will be published here as soon as they are available.'
-//        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
-//  );
-//  open_div( 'smallskips'
-//  , we(   '(Dates will be published here as soon as they are available)'
-//        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-//  );
-
 close_ccbox();
+
 
 open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020") );
 
   open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;'
   , 'Die aktuelle Corona-Epidemie wird Auswirkungen auf den Lehrbetrieb im Sommersemester 2020
-     haben. Insbesondere wird es bis einschließlich 19.04. keine Präsenzveranstaltungen geben,
-     auch andere der untenstehenden Termine können sich noch verschieben.
-     Ab wann und unter welchen Bedingungen Präsenzveranstaltungen wieder möglich sein werden
-     ist noch nicht bekannt. Gegebenenfalls wird der Lehrbetrieb ab dem 20.04. über alternative
-     Kommunikationswege beginnen; bitte informieren Sie sich auf den Webseiten der jeweiligen
-     Veranstaltung!
+     haben, insbesondere beginnen die Lehrveranstaltungen erst am 20.April.
+     Bis auf weiteres sind keine Präsenzveranstaltungen möglich,
+     bitte informieren Sie sich auf den Webseiten der jeweiligen Veranstaltung über
+     die alternativen Formate!
      '
   );
 
@@ -339,26 +206,26 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
   
   echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2020',"Pr{$uUML}fungstermine im Sommersemester 2020") );
   
-//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//   
-//     open_tr();
-//       open_th( '', we( 'course', 'Veranstaltung' ) );
-//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-//   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'M. Wilkens' );
-//         open_span( 'block', 'Mathematische Grundlagen (Lehramt)' );
-//         open_span( 'block', 'BEd A111, PHY-111LAS' );
-//       open_td();
-//         open_span( 'block', '25.07.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.27.1.01' );
-//       open_td();
-//         open_span( 'block', '26.09.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.2.080' );
+  open_table('td:smallskipt;smallskipb;qquads;solidtop');
+  
+    open_tr();
+      open_th( '', we( 'course', 'Veranstaltung' ) );
+      open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+      open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+  
+    open_tr();
+      open_td();
+        open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Mathematische Grundlagen (Lehramt)' );
+        open_span( 'block', 'BEd A111, PHY-111LAS' );
+       open_td();
+         open_span( 'block', '30.07.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', '2.27.0.01' );
+       open_td();
+         open_span( 'block', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
 //   
 //     open_tr();
 //       open_td();
@@ -374,33 +241,33 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
 //         open_span( 'block', '10-12 Uhr' );
 //         open_span( 'block', '' );
 //   
-//     open_tr();
-//       open_td();
-//         open_span( 'block', 'A. Feldmeier' );
-//         open_span( 'block', 'Theoretische Physik I - Mechanik' );
-//         open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
-//       open_td();
-//         open_span( 'block', '23.07.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.12.0.01' );
-//       open_td();
-//         open_span( 'block', '24.09.' );
-//         open_span( 'block', '10.00 Uhr' );
-//         open_span( 'block', '2.28.0.108' );
-//   
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'M. Wilkens' );
-//          open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
-//          open_span( 'block', 'BSc 411' );
-//        open_td();
-//          open_span( 'block', '25.07.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.27.1.01' );
-//        open_td();
-//          open_span( 'block', '26.09.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.28.2.080' );
+    open_tr();
+      open_td();
+        open_span( 'block', 'A. Feldmeier' );
+        open_span( 'block', 'Theoretische Physik I - Mechanik' );
+        open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
+      open_td();
+        open_span( 'block', '29.07.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.25.F0.01' );
+      open_td();
+        open_span( 'block', '28.10.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+  
+     open_tr();
+       open_td();
+         open_span( 'block', 'M. Wilkens' );
+         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+         open_span( 'block', 'BSc 411' );
+       open_td();
+         open_span( 'block', '30.07.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', '2.27.0.01' );
+       open_td();
+         open_span( 'block', 'tba' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
 // 
 //     open_tr();
 //       open_td();
@@ -416,11 +283,11 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
 //         open_span( 'block', '10.00 Uhr' );
 //         open_span( 'block', '2.28.2.080' );
 //   
-//   close_table();
+  close_table();
   
   open_div( 'smallskips'
-  , we(   '(Dates will be published here as soon as they are available)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  , we(   '(More dates will be published here as soon as they are available)'
+        , "(Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
   );
 
 close_ccbox();
