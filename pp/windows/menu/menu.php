@@ -56,7 +56,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
     ') );
   close_div();
 
-  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen der Universität aufgrund der Corona-Pandemie') );
+  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen im Zusammenhang mit der Corona-Pandemie') );
   open_ul();
     // open_li( '', alink_document_view( 'tag=corona20200316' ) );
     open_li( ''
@@ -71,6 +71,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
       , 'Allgemeine Informationen zu Auswirkungen der Corona-Pandemie finden sie auf der Webseite der  Universität: '
       ) . html_alink( 'https://www.uni-potsdam.de', 'class=href outlink large,text=https://www.uni-potsdam.de' )
     );
+    open_li( '', alink_document_view( 'tag=coronaRegeln', 'large' ) );
   close_ul();
 close_div();
 
