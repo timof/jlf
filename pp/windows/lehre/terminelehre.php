@@ -247,9 +247,9 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
         open_span( 'block', 'Theoretische Physik I - Mechanik' );
         open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
       open_td();
-        open_span( 'block', '29.07.' );
+        open_span( 'block', '31.07.' );
         open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.25.F0.01' );
+        open_span( 'block', 'tba' );
       open_td();
         open_span( 'block', '28.10.' );
         open_span( 'block', '' );
