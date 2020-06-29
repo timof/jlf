@@ -2,78 +2,78 @@
 
 sql_transaction_boundary('*');
 
-open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
-  open_div('bigpadb');
-    open_tag( 'h1', 'red', we('Dear Students,', 'Liebe Studierende,' ) );
-    
-    open_tag( 'p', '', we('
-      the lecture period of summer term 2020 will start on Monday April 20;
-      however, no face-to-face teaching will be possible for the time being and online formats
-      will be used instead: videos, documents in Moodle,
-      Zoom-sessions, handing in of scanned excercise sheets, etc.
-    ','
-      der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag, dem
-      20. April 2020, allerdings ohne Präsenzveranstaltungen.
-      Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
-      angeboten: Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
-      Rückgabe eingescannter Übungsblätter etc.
-    ') );
-    
-    open_tag( 'p', '', we('
-    ','
-    ') );
-    
-    open_tag( 'p', '', we('
-      Information on individual courses can be found on '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-        ' and in '
-        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ', as well as on the web pages of the respective '
-          .inlink('professuren', 'class=large bold,text=teachers' ).
-        ' or their '
-          .inlink('forschung', 'class=large bold,text=groups' ).
-        '.
-    ','
-      Wir bitten Sie, sich auf '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-        ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
-        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
-          .inlink('professuren', 'class=large bold,text=Dozenten' ).
-        ' oder deren '
-          .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
-        ' für weitere Informationen.
-    ') );
-    
-    open_tag( 'p', '', we('
-      Please register for courses as soon as possible via '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-     ' so teachers can "see" you and contact you by email (registration starts on April 20).
-    ','
-      Melden Sie sich bitte nach Beginn der Einschreibefrist am 20.04. so bald wie möglich über '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-      ' an, damit die Veranstalter*innen Sie "sehen" und Ihnen email schicken können.
-    ') );
-  close_div();
-
-  open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen im Zusammenhang mit der Corona-Pandemie') );
-  open_ul();
-    // open_li( '', alink_document_view( 'tag=corona20200316' ) );
-    open_li( ''
-    , we(
-        'Information on the consequences of the corona crisis on studies and teaching: '
-      , 'Informationen zu den Auswirkungen der Corona-Krise auf Studium und Lehre: '
-      ) . html_alink( 'https://www.uni-potsdam.de/studium/corona', 'class=href outlink large,text=https://www.uni-potsdam.de/studium/corona' )
-    );
-    open_li( ''
-    , we(
-        'General Information from the University can be found on the university web page: '
-      , 'Allgemeine Informationen zu Auswirkungen der Corona-Pandemie finden sie auf der Webseite der  Universität: '
-      ) . html_alink( 'https://www.uni-potsdam.de', 'class=href outlink large,text=https://www.uni-potsdam.de' )
-    );
-    open_li( '', alink_document_view( 'tag=coronaRegeln', 'large' ) );
-  close_ul();
-close_div();
+// open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+//   open_div('bigpadb');
+//     open_tag( 'h1', 'red', we('Dear Students,', 'Liebe Studierende,' ) );
+//     
+//     open_tag( 'p', '', we('
+//       the lecture period of summer term 2020 will start on Monday April 20;
+//       however, no face-to-face teaching will be possible for the time being and online formats
+//       will be used instead: videos, documents in Moodle,
+//       Zoom-sessions, handing in of scanned excercise sheets, etc.
+//     ','
+//       der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag, dem
+//       20. April 2020, allerdings ohne Präsenzveranstaltungen.
+//       Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
+//       angeboten: Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
+//       Rückgabe eingescannter Übungsblätter etc.
+//     ') );
+//     
+//     open_tag( 'p', '', we('
+//     ','
+//     ') );
+//     
+//     open_tag( 'p', '', we('
+//       Information on individual courses can be found on '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//         ' and in '
+//         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+//         ', as well as on the web pages of the respective '
+//           .inlink('professuren', 'class=large bold,text=teachers' ).
+//         ' or their '
+//           .inlink('forschung', 'class=large bold,text=groups' ).
+//         '.
+//     ','
+//       Wir bitten Sie, sich auf '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//         ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
+//         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+//         ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
+//           .inlink('professuren', 'class=large bold,text=Dozenten' ).
+//         ' oder deren '
+//           .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
+//         ' für weitere Informationen.
+//     ') );
+//     
+//     open_tag( 'p', '', we('
+//       Please register for courses as soon as possible via '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//      ' so teachers can "see" you and contact you by email (registration starts on April 20).
+//     ','
+//       Melden Sie sich bitte nach Beginn der Einschreibefrist am 20.04. so bald wie möglich über '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//       ' an, damit die Veranstalter*innen Sie "sehen" und Ihnen email schicken können.
+//     ') );
+//   close_div();
+// 
+//   open_tag( 'h1', 'red', we('Current Information related to Corona Pandemic','Aktuelle Informationen im Zusammenhang mit der Corona-Pandemie') );
+//   open_ul();
+//     // open_li( '', alink_document_view( 'tag=corona20200316' ) );
+//     open_li( ''
+//     , we(
+//         'Information on the consequences of the corona crisis on studies and teaching: '
+//       , 'Informationen zu den Auswirkungen der Corona-Krise auf Studium und Lehre: '
+//       ) . html_alink( 'https://www.uni-potsdam.de/studium/corona', 'class=href outlink large,text=https://www.uni-potsdam.de/studium/corona' )
+//     );
+//     open_li( ''
+//     , we(
+//         'General Information from the University can be found on the university web page: '
+//       , 'Allgemeine Informationen zu Auswirkungen der Corona-Pandemie finden sie auf der Webseite der  Universität: '
+//       ) . html_alink( 'https://www.uni-potsdam.de', 'class=href outlink large,text=https://www.uni-potsdam.de' )
+//     );
+//     open_li( '', alink_document_view( 'tag=coronaRegeln', 'large' ) );
+//   close_ul();
+// close_div();
 
 open_div('id=teaser');
   open_div( 'class=overlay,id=i1', image( 'lehre', 'alt=' ) );
@@ -110,10 +110,17 @@ close_div();
 // news ticker
 //
 $items = array();
-$items[] = html_span( 'tickerline',
-  html_span( 'bold red', 'abgesagt: ' )
-  . html_alink( '/klimatag', 'class=href inlink,text=Thementag Wissenschaft und Klimawandel am 30.03.' )
+
+$items[] = html_span( 'tickerline'
+, we( 'Information regarding coronavirus pandemic: ', 'Informationen zur Coronavirus-Pandemie: ' )
+  . html_alink( 'https://www.uni-potsdam.de/presse/aktuelles/coronavirus', 'class=href outlink,text=https://www.uni-potsdam.de/presse/aktuelles/coronavirus' )
 );
+
+
+// $items[] = html_span( 'tickerline',
+//   html_span( 'bold red', 'abgesagt: ' )
+//   . html_alink( '/klimatag', 'class=href inlink,text=Thementag Wissenschaft und Klimawandel am 30.03.' )
+// );
 //   '11.05.: '
 //   . html_alink( 'http://marchforscience.de/auch-in-deiner-stadt/potsdam', array( 'class' => 'href outlink', 'text' => 'March for science' ) )
 // $items[] = html_span( 'tickerline',
@@ -133,7 +140,7 @@ foreach( $events as $r ) {
 }
 // $items[] = html_span( 'tickerline bold red', inlink( 'intro', 'text=ab 30.09.: Brückenkurs "Auffrischung Mathe fur Studienanfänger*innen"' ) );
 // $items[] = html_span( 'tickerline', inlink( 'studiengaenge', array( 'text' => we('Information for prospective students: degree programs at the institute', "Informationen f{$uUML}r Studieninteressierte: Studiengänge am Institut" ) ) ) );
-$items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
+// $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
 
 
 open_ccbox( '', we('News','Aktuelles') );
