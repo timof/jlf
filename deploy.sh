@@ -672,7 +672,7 @@ chmod 644 ./pp/windows/forschung/schwerpunkte.php
 chmod 644 ./pp/windows/forschung/thema.php
 chmod 644 ./pp/windows/forschung/themen.php
 chmod 755 ./pp/windows/institut
-chmod 644 ./pp/windows/institut/gremien.php
+chmod 600 ./pp/windows/institut/gremien.php
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/irat.php
