@@ -403,7 +403,7 @@ chmod 644 ./pi/shared/common.php
 chmod 644 ./pi/shared/leitvariable.php
 chmod 644 ./pi/shared/mysql.php
 chmod 644 ./pi/shared/structure.php
-chmod 644 ./pi/shared/views.php
+chmod 600 ./pi/shared/views.php
 chmod 755 ./pi/textemplates
 chmod 644 ./pi/textemplates/applicant.tex
 chmod 644 ./pi/textemplates/position.tex
@@ -672,13 +672,13 @@ chmod 644 ./pp/windows/forschung/schwerpunkte.php
 chmod 644 ./pp/windows/forschung/thema.php
 chmod 644 ./pp/windows/forschung/themen.php
 chmod 755 ./pp/windows/institut
-chmod 600 ./pp/windows/institut/gremien.php
+chmod 644 ./pp/windows/institut/gremien.php
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/irat.php
 chmod 644 ./pp/windows/institut/klimatag.php
 chmod 644 ./pp/windows/institut/klimatag2019.php
-chmod 600 ./pp/windows/institut/klimatag2020.php
+chmod 644 ./pp/windows/institut/klimatag2020.php
 chmod 644 ./pp/windows/institut/labore.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
 chmod 644 ./pp/windows/institut/veranstaltung.php
