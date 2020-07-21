@@ -403,7 +403,7 @@ chmod 644 ./pi/shared/common.php
 chmod 644 ./pi/shared/leitvariable.php
 chmod 644 ./pi/shared/mysql.php
 chmod 644 ./pi/shared/structure.php
-chmod 600 ./pi/shared/views.php
+chmod 644 ./pi/shared/views.php
 chmod 755 ./pi/textemplates
 chmod 644 ./pi/textemplates/applicant.tex
 chmod 644 ./pi/textemplates/position.tex
