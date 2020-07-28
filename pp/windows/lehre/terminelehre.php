@@ -221,7 +221,7 @@ open_ccbox( '', we('Dates in Summer term 2020',"Termine im Sommersemester 2020")
        open_td();
          open_span( 'block', '30.07.' );
          open_span( 'block', '10.00 Uhr' );
-         open_span( 'block', '2.27.0.01' );
+         open_span( 'block bold red', '2.28.0.108' );
        open_td();
          open_span( 'block', 'tba' );
          open_span( 'block', '' );
