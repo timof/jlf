@@ -285,7 +285,7 @@ open_ccbox( '', we('Dates in Winter Term 2020/21',"Termine im Wintersemester 202
                    , array( 'class' => 'href outlink'
                           , 'text' => we('Registration, enrollment, and withdrawal period for courses','Anmelde-, Belegungs- und Rücktrittsfrist für Lehrveranstaltungen')
                      )
-                   );
+      ) );
       
     open_tr('td:/smallskipt/medskipt/');
       open_td( 'oneline red bold', "29.10." );
