@@ -283,7 +283,7 @@ open_ccbox( '', we('Dates in Winter Term 2020/21',"Termine im Wintersemester 202
       open_td( 'oneline', html_div( 'bold red', '19.10. - 30.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 15.10.', "au{$SZLIG}er 15.10." ) ) );
       open_td( '', html_alink( 'http://puls.uni-potsdam.de'
                    , array( 'class' => 'href outlink'
-                          , 'text' => '.we('Registration, enrollment, and withdrawal period for courses','Anmelde-, Belegungs- und Rücktrittsfrist für Lehrveranstaltungen')
+                          , 'text' => we('Registration, enrollment, and withdrawal period for courses','Anmelde-, Belegungs- und Rücktrittsfrist für Lehrveranstaltungen')
                      )
                    );
       
