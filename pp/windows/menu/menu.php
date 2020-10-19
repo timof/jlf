@@ -2,27 +2,55 @@
 
 sql_transaction_boundary('*');
 
-// open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
-//   open_div('bigpadb');
-//     open_tag( 'h1', 'red', we('Dear Students,', 'Liebe Studierende,' ) );
-//     
-//     open_tag( 'p', '', we('
-//       the lecture period of summer term 2020 will start on Monday April 20;
-//       however, no face-to-face teaching will be possible for the time being and online formats
-//       will be used instead: videos, documents in Moodle,
-//       Zoom-sessions, handing in of scanned excercise sheets, etc.
-//     ','
-//       der Vorlesungszeitraum des Sommersemesters 2020 beginnt am Montag, dem
-//       20. April 2020, allerdings ohne Präsenzveranstaltungen.
-//       Die Lehre wird bis auf weiteres in verschiedenen Online-Formaten
-//       angeboten: Videos, kommentierte pdfs auf Moodle, Zoom-Sitzungen,
-//       Rückgabe eingescannter Übungsblätter etc.
-//     ') );
-//     
-//     open_tag( 'p', '', we('
-//     ','
-//     ') );
-//     
+open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+    open_tag( 'h1', 'red', 'Informationen zum Wintersemester 2020/21' );
+    
+    open_tag( 'p', '', '
+      Im Wintersemster 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
+      Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
+      die Fachsemester 1 und 3, die als Präsenzveranstaltungen
+      angeboten werden sollen, finden Sie hier:
+      ' . html_alink(
+            'http://www.astro.physik.uni-potsdam.de/~afeld/praesenzlehre_ws2021.pdf'
+          , 'text=http://www.astro.physik.uni-potsdam.de/~afeld/praesenzlehre_ws2021.pdf,class=href file large bold'
+          )
+    );
+        
+    open_tag( 'p', ''
+    , ' Auch der '
+      . inlink( 'intro', array( 'class' => 'bold large', 'text' => 'Brückenkurs Mathematik für Studienanfänger*innen vom 26.10 bis 30.10.2020' ) )
+      . ' wird voraussichtlich als Präsenzveranstaltung stattfinden.'
+    );
+
+    open_tag( 'p', '', we('
+      Information on individual courses can be found on '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+        ' and in '
+        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+        ', as well as on the web pages of the respective '
+          .inlink('professuren', 'class=large bold,text=teachers' ).
+        ' or their '
+          .inlink('forschung', 'class=large bold,text=groups' ).
+        '.
+    ','
+      Wir bitten Sie, sich auf '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+        ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
+        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+        ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
+          .inlink('professuren', 'class=large bold,text=Dozenten' ).
+        ' oder deren '
+          .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
+        ' für weitere Informationen.
+    ') );
+
+    open_tag( 'p', '', 
+       'Bitte beachten Sie auch die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
+     . html_alink( 'https://www.uni-potsdam.de/presse/aktuelles/coronavirus', 'class=href outlink large bold,text=https://www.uni-potsdam.de/presse/aktuelles/coronavirus' )
+     . '; Insbesondere gilt bis auf weiteres Maskenpflicht
+         in allen Fluren, Treppenhäusern, Aufzügen und Gemeinschaftsräumen der Universität.'
+    );
+    
 //     open_tag( 'p', '', we('
 //       Information on individual courses can be found on '
 //         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
@@ -73,7 +101,7 @@ sql_transaction_boundary('*');
 //     );
 //     open_li( '', alink_document_view( 'tag=coronaRegeln', 'large' ) );
 //   close_ul();
-// close_div();
+close_div();
 
 open_div('id=teaser');
   open_div( 'class=overlay,id=i1', image( 'lehre', 'alt=' ) );
