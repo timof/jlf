@@ -3,6 +3,14 @@
 sql_transaction_boundary('*');
 
 open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+
+    open_tag( 'p', 'bold red Large medskips qquads', '
+      Wir bitten alle Studierenden, sich möglichst umgehend in '
+        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+      ' zu ihren Pflichtveranstaltungen anzumelden, damit ab Beginn der KW 44 die Dozent*innen 
+        die Einteilung in die Präsenzgruppen vornehmen können. Vielen Dank!'
+    );
+
     open_tag( 'h1', 'red', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
     
     open_tag( 'p', '', we(
@@ -17,7 +25,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
           , 'text=http://www.astro.physik.uni-potsdam.de/~afeld/praesenzlehre_ws2021.pdf,class=href file large bold'
           )
     );
-        
+
     if( $GLOBALS['language'] == 'D' ) {
       open_tag( 'p', ''
       , ' Auch der '
@@ -25,6 +33,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
         . ' wird voraussichtlich als Präsenzveranstaltung stattfinden.'
       );
     }
+
 
     open_tag( 'p', '', we('
       Information on individual courses can be found on '
@@ -53,9 +62,9 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;ma
      , 'Bitte beachten Sie auch die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
      ) . html_alink( 'https://www.uni-potsdam.de/presse/aktuelles/coronavirus', 'class=href outlink large bold,text=https://www.uni-potsdam.de/presse/aktuelles/coronavirus' )
      . '; '
-     . we( 'In particular, until further notice, face masks must be worn in all
+     . we( 'in particular, until further notice face masks must be worn in all
             hallways, stairwells and elevators of the University of Potsdam.
-       ','Insbesondere gilt bis auf weiteres Maskenpflicht
+       ','insbesondere gilt bis auf weiteres Maskenpflicht
          in allen Fluren, Treppenhäusern, Aufzügen und Gemeinschaftsräumen der Universität.'
        )
     );
