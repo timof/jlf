@@ -2,16 +2,16 @@
 
 sql_transaction_boundary('*');
 
-open_div('large bold,style=padding:2em;background-color:#ffff88;color:#ff0000;margin-bottom:2em;');
+open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;margin-bottom:2em;');
 
-    open_tag( 'p', 'bold red Large medskips qquads', '
-      Wir bitten alle Studierenden, sich möglichst umgehend in '
+    open_tag( 'p', 'bold red Large bigskips qquads', '
+      Wir bitten alle Studierenden, sich umgehend in '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
       ' zu ihren Pflichtveranstaltungen anzumelden, damit ab Beginn der KW 44 die Dozent*innen 
         die Einteilung in die Präsenzgruppen vornehmen können. Vielen Dank!'
     );
 
-    open_tag( 'h1', 'red', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
+    open_tag( 'h1', '', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
     
     open_tag( 'p', '', we(
       'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
