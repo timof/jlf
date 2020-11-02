@@ -1,39 +1,43 @@
+
 <?php // /pp/windows/menu/menu.php
 
 sql_transaction_boundary('*');
 
 open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;margin-bottom:2em;');
 
-    open_tag( 'p', 'bold red Large bigskips qquads', '
-      Wir bitten alle Studierenden, sich umgehend in '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-      ' zu ihren Pflichtveranstaltungen anzumelden, damit ab Beginn der KW 44 die Dozent*innen 
-        die Einteilung in die Präsenzgruppen vornehmen können. Vielen Dank!'
-    );
-
     open_tag( 'h1', '', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
     
-    open_tag( 'p', '', we(
-      'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
-       The current schedule for face-to-face teaching can be found here: '
-      , 'Im Wintersemster 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
-         Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
-         die Fachsemester 1 und 3, die als Präsenzveranstaltungen
-         angeboten werden sollen, finden Sie hier: ' )
-      . html_alink( 
-            'http://www.astro.physik.uni-potsdam.de/~afeld/praesenzlehre_ws2021.pdf'
-          , 'text=http://www.astro.physik.uni-potsdam.de/~afeld/praesenzlehre_ws2021.pdf,class=href file large bold'
-          )
-    );
-
-    if( $GLOBALS['language'] == 'D' ) {
-      open_tag( 'p', ''
-      , ' Auch der '
-        . inlink( 'intro', array( 'class' => 'bold large', 'text' => 'Brückenkurs Mathematik für Studienanfänger*innen vom 26.10 bis 30.10.2020' ) )
-        . ' wird voraussichtlich als Präsenzveranstaltung stattfinden.'
+    open_tag( 'p', 'smallskips' );
+      echo we(
+        'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
+         The current schedule for face-to-face teaching can be found here: 
+         ' . alink_document_view( 'tag=corona20200316' )
+      , '
+         Eine abschließende Regelung zur Präsenzlehre im Wintersemester 2020/21
+         gibt es noch nicht. Der aktuelle Planungsstand und wahrscheinlichstes
+         Szenario ist:
+         '.html_tag('br','smallskips').'
+         Die Präsenzpraktika werden wie geplant durchgeführt und auch in der 
+         ersten
+         Vorlesungswoche beginnen.
+         '.html_tag('br','smallskips').'
+         Die geplanten Präsenz-Übungen werden ab der zweiten
+         Vorlesungswoche durchgeführt, gegebenenfalls zu etwas anderen Zeiten. 
+         '.html_tag('br','smallskips').'
+         In der ersten Semesterwoche finden entweder keine Übungen statt oder sie sind online
+         '.html_tag('br','smallskips').'
+         Vorlesungen des Bachelor und Master Physik (Mono-und Lehramt) 
+         beginnen in der ersten Vorlesungswoche online zu den festgelegten Zeiten.
+         '.html_tag('br','smallskips').'
+         Den aktuellen Planungsstand zur Präsenzlehre finden sie hier:
+         ' . alink_document_view( 'tag=corona20200316' )
+           . html_tag('br','smallskips')
+//           Im Wintersemester 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
+//         Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
+//         die Fachsemester 1 und 3, die als Präsenzveranstaltungen
+//         angeboten werden sollen, finden Sie hier:
       );
-    }
-
+    close_tag( 'p' );
 
     open_tag( 'p', '', we('
       Information on individual courses can be found on '
@@ -45,7 +49,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
         ' or their '
           .inlink('forschung', 'class=large bold,text=groups' ).
         '.
-    ','
+    ',' Weitergehende Informationen erhalten Sie von den Lehrenden.
       Wir bitten Sie, sich auf '
         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
         ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
