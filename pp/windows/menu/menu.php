@@ -11,10 +11,10 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
       echo we(
         'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
          The current schedule for face-to-face teaching can be found here: 
-         ' . alink_document_view( 'tag=praesenzWS2020', 'class=large' )
+         ' . alink_document_view( 'tag=praesenzWS2020' )
       , '
          Eine abschließende Regelung zur Präsenzlehre im Wintersemester 2020/21
-         gibt es noch nicht. Der aktuelle Planungsstand und wahrscheinlichstes
+         gibt es noch nicht. Das nach aktuellem Planungsstand wahrscheinlichste
          Szenario ist:
          '.html_tag('br','smallskips').'
          Die Präsenzpraktika werden wie geplant durchgeführt und auch in der 
@@ -30,7 +30,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
          beginnen in der ersten Vorlesungswoche online zu den festgelegten Zeiten.
          '.html_tag('br','smallskips').'
          Den aktuellen Planungsstand zur Präsenzlehre finden sie hier:
-         ' . alink_document_view( 'tag=praesenzWS2020', 'class=large' )
+         ' . alink_document_view( 'tag=praesenzWS2020' )
            . html_tag('br','smallskips')
 //           Im Wintersemester 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
 //         Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
