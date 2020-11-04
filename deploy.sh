@@ -620,6 +620,7 @@ chmod 600 ./pp/windows/lehre/b2
 chmod 644 ./pp/windows/lehre/bed.php
 chmod 644 ./pp/windows/lehre/brueckenkurs.php
 chmod 644 ./pp/windows/lehre/bsc.php
+chmod 700 ./pp/windows/lehre/deploy.sh
 chmod 644 ./pp/windows/lehre/diplom.php
 chmod 644 ./pp/windows/lehre/einschreibung.php
 chmod 600 ./pp/windows/lehre/exam.template.summer

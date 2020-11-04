@@ -27,7 +27,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
               Frist an den ' . alink_person_view( 'offices.board=examBoardMono,offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
            )
       ); 
-  
+
     open_tr();
       open_td( 'oneline', "15.02. - 15.03." );
       open_td(''
