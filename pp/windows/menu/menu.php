@@ -5,65 +5,65 @@ sql_transaction_boundary('*');
 
 open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;margin-bottom:2em;');
 
-    open_tag( 'h1', '', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
-    
-    open_tag( 'p', 'smallskips' );
-      echo we(
-        'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
-        '
-//         The current schedule for face-to-face teaching can be found here: 
-//         ' . alink_document_view( 'tag=praesenzWS2020' )
-      , '
-         Eine abschließende Regelung zur Präsenzlehre im Wintersemester 2020/21
-         gibt es noch nicht. Das nach aktuellem Planungsstand wahrscheinlichste
-         Szenario ist:
-         '.html_tag('br').'
-         Die Präsenzpraktika werden wie geplant durchgeführt und beginnen auch in
-         der ersten Vorlesungswoche.
-         '.html_tag('br','smallskips').'
-         Die geplanten Präsenz-Übungen werden ab der zweiten
-         Vorlesungswoche durchgeführt, gegebenenfalls zu etwas anderen Zeiten. 
-         '.html_tag('br','smallskips').'
-         In der ersten Semesterwoche finden entweder keine Übungen statt oder sie sind online
-         '.html_tag('br','smallskips').'
-         Vorlesungen des Bachelor und Master Physik (Mono-und Lehramt) 
-         beginnen in der ersten Vorlesungswoche online zu den festgelegten Zeiten.
-         '.html_tag('br','smallskips')
-//         Den aktuellen Planungsstand zur Präsenzlehre finden sie hier:
-//         ' . alink_document_view( 'tag=praesenzWS2020' )
-//           . html_tag('br','smallskips')
-//           Im Wintersemester 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
-//         Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
-//         die Fachsemester 1 und 3, die als Präsenzveranstaltungen
-//         angeboten werden sollen, finden Sie hier:
-      );
-    close_tag( 'p' );
-
-    open_tag( 'p', '', we('
-      Information on individual courses can be found on '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-        ' and in '
-        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ', as well as on the web pages of the respective '
-          .inlink('professuren', 'class=large bold,text=teachers' ).
-        ' or their '
-          .inlink('forschung', 'class=large bold,text=groups' ).
-        '.
-    ',' Weitergehende Informationen erhalten Sie von den Lehrenden.
-      Wir bitten Sie, sich auf '
-        .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
-        ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
-        .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
-        ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
-          .inlink('professuren', 'class=large bold,text=Dozenten' ).
-        ' oder deren '
-          .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
-        ' für weitere Informationen.
-    ') );
+//     open_tag( 'h1', '', we( 'Teaching in winter term 2020/21', 'Informationen zur Lehre im Wintersemester 2020/21' ) );
+//     
+//     open_tag( 'p', 'smallskips' );
+//       echo we(
+//         'Courses in winter term 2020/21 will again take place in digital formats only, with few exceptions for some Bachelor classes.
+//         '
+// //         The current schedule for face-to-face teaching can be found here: 
+// //         ' . alink_document_view( 'tag=praesenzWS2020' )
+//       , '
+//          Eine abschließende Regelung zur Präsenzlehre im Wintersemester 2020/21
+//          gibt es noch nicht. Das nach aktuellem Planungsstand wahrscheinlichste
+//          Szenario ist:
+//          '.html_tag('br').'
+//          Die Präsenzpraktika werden wie geplant durchgeführt und beginnen auch in
+//          der ersten Vorlesungswoche.
+//          '.html_tag('br','smallskips').'
+//          Die geplanten Präsenz-Übungen werden ab der zweiten
+//          Vorlesungswoche durchgeführt, gegebenenfalls zu etwas anderen Zeiten. 
+//          '.html_tag('br','smallskips').'
+//          In der ersten Semesterwoche finden entweder keine Übungen statt oder sie sind online
+//          '.html_tag('br','smallskips').'
+//          Vorlesungen des Bachelor und Master Physik (Mono-und Lehramt) 
+//          beginnen in der ersten Vorlesungswoche online zu den festgelegten Zeiten.
+//          '.html_tag('br','smallskips')
+// //         Den aktuellen Planungsstand zur Präsenzlehre finden sie hier:
+// //         ' . alink_document_view( 'tag=praesenzWS2020' )
+// //           . html_tag('br','smallskips')
+// //           Im Wintersemester 2020/21 wird die Lehre am Institut erneut weitgehend online stattfinden müssen.
+// //         Den aktuellen Planungsstand zu den Veranstaltungen, vornehmlich für
+// //         die Fachsemester 1 und 3, die als Präsenzveranstaltungen
+// //         angeboten werden sollen, finden Sie hier:
+//       );
+//     close_tag( 'p' );
+// 
+//     open_tag( 'p', '', we('
+//       Information on individual courses can be found on '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//         ' and in '
+//         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+//         ', as well as on the web pages of the respective '
+//           .inlink('professuren', 'class=large bold,text=teachers' ).
+//         ' or their '
+//           .inlink('forschung', 'class=large bold,text=groups' ).
+//         '.
+//     ',' Weitergehende Informationen erhalten Sie von den Lehrenden.
+//       Wir bitten Sie, sich auf '
+//         .html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).
+//         ' im Kommentarfeld der jeweiligen Veranstaltung sowie bei '
+//         .html_alink( 'https://moodle.uni-potsdam.de', 'text=MOODLE,class=href outlink large bold' ).
+//         ' zu informieren. Bitte besuchen Sie auch die Webseiten der jeweiligen '
+//           .inlink('professuren', 'class=large bold,text=Dozenten' ).
+//         ' oder deren '
+//           .inlink('forschung', 'class=large bold,text=Arbeitsgruppen' ).
+//         ' für weitere Informationen.
+//     ') );
 
     open_tag( 'p', '',  we(
        'Please note the current measures and information of the University in connection with the Coronavirus: '
-     , 'Bitte beachten Sie auch die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
+     , 'Bitte beachten Sie die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
      ) . html_alink( 'https://www.uni-potsdam.de/presse/aktuelles/coronavirus', 'class=href outlink large bold,text=https://www.uni-potsdam.de/presse/aktuelles/coronavirus' )
      . '; '
      . we( 'in particular, until further notice face masks must be worn in all
