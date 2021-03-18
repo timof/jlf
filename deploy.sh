@@ -634,6 +634,7 @@ chmod 644 ./pp/windows/lehre/phd.php
 chmod 644 ./pp/windows/lehre/praktika.php
 chmod 644 ./pp/windows/lehre/studiengaenge.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
+chmod 600 ./pp/windows/lehre/t
 chmod 644 ./pp/windows/lehre/terminelehre.php
 chmod 644 ./pp/windows/lehre/tutorium.php
 chmod 755 ./pp/windows/menu
