@@ -377,6 +377,7 @@ open_ccbox( '', we('Dates in Summer Term 2021',"Termine im Sommersemester 2021")
   
   echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2021',"Pr{$uUML}fungstermine im Sommersemester 2021") );
 //
+  open_table('td:smallskipt;smallskipb;quads');
     open_tr();
       open_th( '', we( 'course', 'Veranstaltung' ) );
       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
