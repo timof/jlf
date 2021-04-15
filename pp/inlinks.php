@@ -6,7 +6,7 @@
 $sidenav_map = array(
   'menu' => 1
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
-    'intro' => 1
+    'intro' => 0
   , 'modul' => 0
   , 'studiengaenge' => array( 'menu' => 1, 'childs' => array(
       'bsc' => 1
