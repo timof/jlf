@@ -92,7 +92,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
            )
         );
 
-       open_tag( 'h4', '', we('A goot start into the new semester!','Einen guten Start ins neue Semester!' ) );
+       open_tag( 'h4', '', we('A good start into the new semester!','Einen guten Start ins neue Semester!' ) );
 
     close_tag( 'p' );
     
