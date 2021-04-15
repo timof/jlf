@@ -302,6 +302,8 @@ open_div('bigskps'
   . alink_person_view( 'gn=dieter,sn=neher' )
   . ' und '
   . alink_person_view( 'gn=frank,sn=spahn' )
+  . ' gemeinsam mit '
+  . html_alink( 'https://www.unisolar-potsdam.de', 'class=href outlink,text=UniSolar Potsdam' )
   . '.'
 );
 
