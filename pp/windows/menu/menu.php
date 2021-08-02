@@ -62,27 +62,27 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
 
     open_tag( 'p', 'medskips' );
 
-       open_tag( 'h4', '', we('Dear students,','Liebe Studierende,') );
-       
-       open_tag( 'p', '', we('
-       in the new semester, all classes except lab courses will begin in virtual space.
-       Please check your email account @uni-potsdam.de, as this account will be used
-       by teachers to send you information concerning the classes. You must sign up via
-          '.html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).'
-       for a class in order to receive information via email.
-       ','
-        im neuen Semester starten alle Lehrveranstaltungen außer den Praktika im 
-        virtuellen Raum. Bitte kontrollieren Sie regelmäßig Ihren @uni-potsdam 
-        email account, Sie werden von den Lehrenden über den Start und die 
-        Modalitäten der Lehrveranstaltungen kontaktiert. Dazu müssen Sie in
-          '.html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).'
-        für die Lehrveranstaltung angemeldet sein.
-       ') );
-        
+//        open_tag( 'h4', '', we('Dear students,','Liebe Studierende,') );
+//        
+//        open_tag( 'p', '', we('
+//        in the new semester, all classes except lab courses will begin in virtual space.
+//        Please check your email account @uni-potsdam.de, as this account will be used
+//        by teachers to send you information concerning the classes. You must sign up via
+//           '.html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).'
+//        for a class in order to receive information via email.
+//        ','
+//         im neuen Semester starten alle Lehrveranstaltungen außer den Praktika im 
+//         virtuellen Raum. Bitte kontrollieren Sie regelmäßig Ihren @uni-potsdam 
+//         email account, Sie werden von den Lehrenden über den Start und die 
+//         Modalitäten der Lehrveranstaltungen kontaktiert. Dazu müssen Sie in
+//           '.html_alink( 'https://puls.uni-potsdam.de', 'text=PULS,class=href outlink large bold' ).'
+//         für die Lehrveranstaltung angemeldet sein.
+//        ') );
+//         
     
         open_tag( 'p', 'medskips',  we(
            'Please note the current measures and information of the University in connection with the Coronavirus: '
-         , 'Bitte beachten Sie auch die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
+         , 'Bitte beachten Sie die aktuellen Informationen der Universität zum Umgang mit der Coronavirus-Pandemie: '
          ) . html_alink( 'https://www.uni-potsdam.de/presse/aktuelles/coronavirus', 'class=href outlink large bold,text=https://www.uni-potsdam.de/presse/aktuelles/coronavirus' )
          . '; '
          . we( 'in particular, until further notice face masks must be worn in all
@@ -92,7 +92,7 @@ open_div('large bold,style=padding:2em;background-color:#ffff88;color:#000000;ma
            )
         );
 
-       open_tag( 'h4', '', we('A good start into the new semester!','Einen guten Start ins neue Semester!' ) );
+//       open_tag( 'h4', '', we('A good start into the new semester!','Einen guten Start ins neue Semester!' ) );
 
     close_tag( 'p' );
     
