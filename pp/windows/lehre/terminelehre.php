@@ -205,10 +205,9 @@ open_ccbox( '', we('Dates in Summer Term 2021',"Termine im Sommersemester 2021")
         open_span( 'block', '10.00 Uhr' );
         open_span( 'block', '2.27.0.01' );
       open_td();
-        open_span( 'block', 'tba' );
-        open_span( 'block', '' );
-        open_span( 'block', '' );
-          
+        open_span( 'block', '23.09.' );
+        open_span( 'block', '10.00 Uhr' );
+        open_span( 'block', '2.28.2.080' );
 
     close_table();
 
