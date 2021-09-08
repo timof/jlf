@@ -229,11 +229,11 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
   open_table('td:smallskipt;smallskipb;quads');
   
     open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', html_span('red bold', '04.10. - 22.10.') );
+      open_td('oneline', html_span('', '04.10. - 22.10.') );
       open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
   
     open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline', html_div( 'bold red', '01.10. - 10.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 21.10.', "au{$SZLIG}er 21.10." ) ) );
+      open_td( 'oneline', html_div( '', '01.10. - 10.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 21.10.', "au{$SZLIG}er 21.10." ) ) );
       open_td( '', html_alink( 'http://puls.uni-potsdam.de'
                    , array( 'class' => 'href outlink'
                           , 'text' => we('Registration, enrollment, and withdrawal period for courses','Anmelde-, Belegungs- und Rücktrittsfrist für Lehrveranstaltungen')
@@ -241,7 +241,7 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
       ) );
       
     open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline red bold', "21.10." );
+      open_td( 'oneline', "21.10." );
       open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
   
   //  open_tr();
