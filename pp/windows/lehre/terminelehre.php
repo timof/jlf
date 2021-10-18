@@ -118,108 +118,6 @@ close_ccbox();
 
 
 
-open_ccbox( '', we('Dates in Summer Term 2021',"Termine im Sommersemester 2021") );
-
-  echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2021',"Allgemeine Termine im Sommersemester 2021") );
-  
-  open_table('td:smallskipt;smallskipb;quads');
-  
-//     open_tr('td:/smallskipt/medskipt/');
-//       open_td('oneline', "03.04. - 06.04." );
-//       open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
-
-  
-    open_tr('td:/smallskipt/medskipt/'); 
-      open_td( 'oneline', html_div( '', '06.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 08.04.', "au{$SZLIG}er 08.04." ) ) );
-      open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses','Belegen der Lehrveranstaltungen') ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td( 'oneline red bold', "08.04." );
-      open_td( '', we('Start of admission (no registration possible)', "Beginn der Zulassung (keine Belegung m{$oUML}glich)" ) );
-  
-  //  open_tr();
-  //    open_td('oneline', "03.11." );
-  //    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
-  
-//     open_tr('td:/smallskipt/medskipt/');
-//       open_td( 'oneline', html_div( '', '01.04. - 20.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 04.04.', "au{$SZLIG}er 04.04." ) ) );
-//       open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
-  
-    // open_tr();
-      // open_td('oneline', "20.11." );
-      // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
-      
-      open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', '12.04. - 23.07.' );
-      open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
-      
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "15.06. - 15.07." );
-      open_td('', we('Period for re-registration for Winter term 2020/21', "R{$uUML}ckmeldung zum Wintersemester 2020/21" ) );
-  	
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "26.07. - 31.07." );
-      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  
-    open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "01.08. - 31.08." );
-      open_td('', we('Summer break', "Sommerpause" ) );
-  
-  	open_tr('td:/smallskipt/medskipt/');
-      open_td('oneline', "01.09. - 30.09." );
-      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  	
-  close_table();
-  
-  
-  
-  echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2021',"Pr{$uUML}fungstermine im Sommersemester 2021") );
-//
-  open_table('td:smallskipt;smallskipb;qquads;solidtop');
-    open_tr();
-      open_th( '', we( 'course', 'Veranstaltung' ) );
-      open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-      open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-
-    open_tr();
-      open_td();
-        open_span( 'block', 'A. Feldmeier' );
-        open_span( 'block', 'Theoretische Physik I - Mechanik' );
-        open_span( 'block', '' );
-      open_td();
-        open_span( 'block', '26.07.' );
-        open_span( 'block', '15.00 - 18.00 Uhr' );
-        open_span( 'block', '2.27.0.01' );
-        open_span( 'block', '2.27.1.01' );
-      open_td();
-        open_span( 'block', 'tba' );
-        open_span( 'block', '' );
-        open_span( 'block', '' );
-    open_tr();
-      open_td();
-        open_span( 'block', 'M. Wilkens' );
-        open_span( 'block', 'Theoretische Physik III - Quantenmechanik' );
-        open_span( 'block', '' );
-      open_td();
-        open_span( 'block', '29.07.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.27.0.01' );
-      open_td();
-        open_span( 'block', '23.09.' );
-        open_span( 'block', '10.00 Uhr' );
-        open_span( 'block', '2.28.2.080' );
-
-    close_table();
-
-  open_div( 'smallskips'
-  , we(   'More dates will be published here as soon as they are available.'
-        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
-  );
-//   open_div( 'smallskips'
-//   , we(   '(Dates will be published here as soon as they are available)'
-//         , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-//   );
-close_ccbox();
 
 
 open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 2021/22") );
@@ -407,6 +305,114 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
   );
 
 close_ccbox();
+
+
+
+open_ccbox( '', we('Dates in Summer Term 2022',"Termine im Sommersemester 2022") );
+
+  echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2022',"Allgemeine Termine im Sommersemester 2022") );
+  
+  open_table('td:smallskipt;smallskipb;quads');
+  
+//     open_tr('td:/smallskipt/medskipt/');
+//       open_td('oneline', "03.04. - 06.04." );
+//       open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
+
+  
+    open_tr('td:/smallskipt/medskipt/'); 
+      open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 13.04.', "au{$SZLIG}er 13.04." ) ) );
+      open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses','Belegen der Lehrveranstaltungen') ) );
+      
+    open_tr('td:/smallskipt/medskipt/');
+      open_td( 'oneline red bold', "13.04." );
+      open_td( '', we('Start of admission (no registration possible)', "Beginn der Zulassung (keine Belegung m{$oUML}glich)" ) );
+  
+  //  open_tr();
+  //    open_td('oneline', "03.11." );
+  //    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
+  
+//     open_tr('td:/smallskipt/medskipt/');
+//       open_td( 'oneline', html_div( '', '01.04. - 20.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 04.04.', "au{$SZLIG}er 04.04." ) ) );
+//       open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
+  
+    // open_tr();
+      // open_td('oneline', "20.11." );
+      // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
+      
+      open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', '19.04. - 29.07.' );
+      open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
+      
+    open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "15.06. - 15.07." );
+      open_td('', we('Period for re-registration for Winter term 2020/21', "R{$uUML}ckmeldung zum Wintersemester 2020/21" ) );
+  	
+//    open_tr('td:/smallskipt/medskipt/');
+//      open_td('oneline', "26.07. - 31.07." );
+//      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
+  
+    open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "01.08. - 31.08." );
+      open_td('', we('Summer break', "Sommerpause" ) );
+  
+  	open_tr('td:/smallskipt/medskipt/');
+      open_td('oneline', "01.09. - 30.09." );
+      open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
+  	
+  close_table();
+  
+  
+  
+  echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2022',"Pr{$uUML}fungstermine im Sommersemester 2022") );
+//
+//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
+//     open_tr();
+//       open_th( '', we( 'course', 'Veranstaltung' ) );
+//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+// 
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'A. Feldmeier' );
+//         open_span( 'block', 'Theoretische Physik I - Mechanik' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '26.07.' );
+//         open_span( 'block', '15.00 - 18.00 Uhr' );
+//         open_span( 'block', '2.27.0.01' );
+//         open_span( 'block', '2.27.1.01' );
+//       open_td();
+//         open_span( 'block', 'tba' );
+//         open_span( 'block', '' );
+//         open_span( 'block', '' );
+//     open_tr();
+//       open_td();
+//         open_span( 'block', 'M. Wilkens' );
+//         open_span( 'block', 'Theoretische Physik III - Quantenmechanik' );
+//         open_span( 'block', '' );
+//       open_td();
+//         open_span( 'block', '29.07.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.27.0.01' );
+//       open_td();
+//         open_span( 'block', '23.09.' );
+//         open_span( 'block', '10.00 Uhr' );
+//         open_span( 'block', '2.28.2.080' );
+// 
+//     close_table();
+// 
+//   open_div( 'smallskips'
+//   , we(   'More dates will be published here as soon as they are available.'
+//         , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+//   );
+  open_div( 'smallskips'
+  , we(   '(Dates will be published here as soon as they are available)'
+        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  );
+close_ccbox();
+
+
+
 
 
 
