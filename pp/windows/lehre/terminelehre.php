@@ -173,12 +173,12 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
   echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2021/22',"Pr{$uUML}fungstermine im Wintersemester 2021/22") );
   // 
   
-//   open_table('td:smallskipt;smallskipb;qquads;solidtop');
-//   
-//     open_tr();
-//       open_th( '', we( 'course', 'Veranstaltung' ) );
-//       open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//       open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+  open_table('td:smallskipt;smallskipb;qquads;solidtop');
+  
+    open_tr();
+      open_th( '', we( 'course', 'Veranstaltung' ) );
+      open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+      open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
 //    
 //      open_tr();
 //        open_td();
@@ -208,19 +208,19 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
 //           open_span( 'block', '10.15-11.45 Uhr' );
 //           open_span( 'block', '2.27.0.01' );
 //  
-//       open_tr();
-//         open_td();
-//           open_span( 'block', 'A. Feldmeier' );
-//           open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
-//           open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
-//         open_td();
-//           open_span( 'block', '19.02.' );
-//           open_span( 'block', '15-17 Uhr' );
-//           open_span( 'block', '2.27.0.01' );
-//         open_td();
-//           open_span( 'block', '08.04.' );
-//           open_span( 'block', '10-12 Uhr' );
-//           open_span( 'block', '2.28.0.108' );
+      open_tr();
+        open_td();
+          open_span( 'block', 'A. Feldmeier' );
+          open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
+          open_span( 'block', 'BSc 311, PHY_311, Nebenfach MAT311' );
+        open_td();
+          open_span( 'block', '23.02.' );
+          open_span( 'block', '13-15 Uhr' );
+          open_span( 'block', '2.27.1.01' );
+        open_td();
+          open_span( 'block', '14.04.' );
+          open_span( 'block', '10-12 Uhr' );
+          open_span( 'block', '2.28.0.108' );
 // 
 //      open_tr();
 //        open_td();
@@ -237,19 +237,19 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
 //          open_span( 'block', '10-13 Uhr' );
 //          open_span( 'block', '2.27.0.01' );
 // 
-//     open_tr();
-//       open_td();
-//       open_span( 'block', 'R. Metzler' );
-//         open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
-//         open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
-//       open_td();
-//         open_span( 'block', '26.02.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
-//       open_td();
-//         open_span( 'block', '26.03.' );
-//         open_span( 'block', '' );
-//         open_span( 'block', '' );
+    open_tr();
+      open_td();
+      open_span( 'block', 'R. Metzler' );
+        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
+        open_span( 'block', 'BSc 511, PHY_511, Nebenfach MAT511' );
+      open_td();
+        open_span( 'block', '25.02.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
+      open_td();
+        open_span( 'block', '25.03.' );
+        open_span( 'block', '' );
+        open_span( 'block', '' );
 // 
 //      open_tr();
 //        open_td();
@@ -293,16 +293,16 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
 //          open_span( 'block', '10.00 Uhr' );
 //          open_span( 'block', '2.28.2.080' );
 // 
-// close_table();
-//   
-//   open_div( 'smallskips'
-//   , we(   'More dates will be published here as soon as they are available.'
-//         , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
-//   );
+close_table();
+  
   open_div( 'smallskips'
-  , we(   '(Dates will be published here as soon as they are available)'
-        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+  , we(   'More dates will be published here as soon as they are available.'
+        , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
   );
+//  open_div( 'smallskips'
+//  , we(   '(Dates will be published here as soon as they are available)'
+//        , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+//  );
 
 close_ccbox();
 
