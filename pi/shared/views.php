@@ -184,10 +184,12 @@ function groupcontact_view( $group ) {
     . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
   );
 
-  $s .= html_div( 'tr'
-  , html_div( 'td', we('Secretary:','Sekretariat:' ) )
-    . html_div( 'td', alink_person_view( $group['secretary_people_id'], 'office' ) )
-  );
+  if( $group['acronym'] !== 'fp' ) { // fp has no secretary
+    $s .= html_div( 'tr'
+    , html_div( 'td', we('Secretary:','Sekretariat:' ) )
+      . html_div( 'td', alink_person_view( $group['secretary_people_id'], 'office' ) )
+    );
+  }
 
   if( $group['url'] ) {
     $s .= html_div( 'tr'
