@@ -85,9 +85,9 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'fp':
-      return html_img( '/pp/fotos/master.jpg'
-      , we( 'Laser experiment in advanced lab course','Laserexperiment im Fortgeschrittenenpraktikum')
-      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      return html_img( '/pp/fotos/master2.jpg'
+      , 'Optische Bauelemente'
+      , ( $credits === true ? credits('Axel Heuer') : $credits )
       , $opts
       );
     case 'h28innenhof':

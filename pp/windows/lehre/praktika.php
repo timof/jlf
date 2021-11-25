@@ -34,7 +34,7 @@ if( $group ) {
 $group = sql_one_group( array( 'status' => GROUPS_STATUS_LABCOURSE, 'acronym' => 'fp', 'flag_publish' ), 0 );
 if( $group ) {
   $groups_id = $group['groups_id'];
-  open_ccbox( 'group', we('Advanced Lab Course','Fortgeschrittenenpraktikum') );
+  open_ccbox( array( 'class' => 'group', 'style' => 'min-height:400px;' ), we('Advanced Lab Course','Fortgeschrittenenpraktikum') );
     open_div( 'illu', image('fp') );
 
     echo html_div( 'medskips', $group['note'] );
