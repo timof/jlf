@@ -194,20 +194,20 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
 //          open_span( 'block', '10.00 Uhr' );
 //          open_span( 'block', '2.28.0.102' );
 //    
-//       open_tr();
-//         open_td();
-//           open_span( 'block', 'D. Neher' );
-//           open_span( 'block', 'Experimentalphysik I' );
-//           open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
-//         open_td();
-//           open_span( 'block', '17.02.' );
-//           open_span( 'block', '13.15-14.45 Uhr' );
-//           open_span( 'block', '2.27.0.01 und 2.27.1.01' );
-//         open_td();
-//           open_span( 'block', '24.03.' );
-//           open_span( 'block', '10.15-11.45 Uhr' );
-//           open_span( 'block', '2.27.0.01' );
-//  
+      open_tr();
+        open_td();
+          open_span( 'block', 'D. Neher' );
+          open_span( 'block', 'Experimentalphysik I' );
+          open_span( 'block', 'BSc 101, PHY_101, BEd A101, 181, PHY-101LAS, Nebenfach MAT101, IFGP1' );
+        open_td();
+          open_span( 'block', '19.02.' );
+          open_span( 'block', '13.15 Uhr' );
+          open_span( 'block', 'tba' );
+        open_td();
+          open_span( 'block', '29.03.' );
+          open_span( 'block', '10.15 Uhr' );
+          open_span( 'block', 'tba' );
+ 
       open_tr();
         open_td();
           open_span( 'block', 'A. Feldmeier' );
@@ -221,6 +221,21 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
           open_span( 'block', '14.04.' );
           open_span( 'block', '10-12 Uhr' );
           open_span( 'block', '2.28.0.108' );
+
+//       open_tr();
+//         open_td();
+//           open_span( 'block', 'J. Metzger' );
+//           open_span( 'block', 'Mathematik für Physiker I' );
+//           open_span( 'block', '' );
+//         open_td();
+//           open_span( 'block', '19.02.' );
+//           open_span( 'block', '13.15 Uhr' );
+//           open_span( 'block', 'tba' );
+//         open_td();
+//           open_span( 'block', '29.03.' );
+//           open_span( 'block', '10.15 Uhr' );
+//           open_span( 'block', 'tba' );
+//  
 // 
 //      open_tr();
 //        open_td();
@@ -279,19 +294,19 @@ open_ccbox( '', we('Dates in Winter Term 2021/22',"Termine im Wintersemester 202
 //           open_span( 'block', '' );
 //           open_span( 'block', '' );
 // 
-//      open_tr();
-//        open_td();
-//          open_span( 'block', 'M. Wilkens' );
-//          open_span( 'block', 'Theoretische Physik III Lehramt' );
-//          open_span( 'block', 'MEd Physik, Modul A711' );
-//        open_td();
-//          open_span( 'block', '14.02.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.27.0.01' );
-//        open_td();
-//          open_span( 'block', '04.04.' );
-//          open_span( 'block', '10.00 Uhr' );
-//          open_span( 'block', '2.28.2.080' );
+     open_tr();
+       open_td();
+         open_span( 'block', 'M. Wilkens' );
+         open_span( 'block', 'Theoretische Physik I Lehramt' );
+         open_span( 'block', '' );
+       open_td();
+         open_span( 'block', '03.03.' );
+         open_span( 'block', '10.00 Uhr' );
+         open_span( 'block', '2.28.0.108' );
+       open_td();
+         open_span( 'block', '' );
+         open_span( 'block', '' );
+         open_span( 'block', '' );
 // 
 close_table();
   
